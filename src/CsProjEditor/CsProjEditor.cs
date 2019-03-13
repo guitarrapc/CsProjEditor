@@ -8,10 +8,16 @@ namespace CsProjEditor
 {
     public class CsProjEditor
     {
+        public enum EolType
+        {
+            CRLF,
+            LF,
+        }
+        private static Func<EolType, string> EolString = eol => eol == EolType.CRLF ? "\r\n" : "\n";
         private readonly int baseSpaceNum = 2;
 
         private readonly string csproj;
-        public string Eol { get; private set; }
+        public EolType Eol { get; private set; }
         public Encoding Encoding { get; private set; }
 
         public XElement Root { get; private set; }
@@ -79,7 +85,7 @@ namespace CsProjEditor
         /// </remarks>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string GetEndOfLine(string path)
+        public static EolType GetEndOfLine(string path)
         {
             using (var reader = new FileStream(path, FileMode.Open))
             {
@@ -89,7 +95,7 @@ namespace CsProjEditor
                     .Select((e, i) => (left: e, right: bits[i + 1]))
                     .Where(x => x.left == 13 && x.right == 10)
                     .Any();
-                return isCRLF ? "\r\n" : "\n";
+                return isCRLF ? EolType.CRLF : EolType.LF;
             }
         }
 
@@ -102,12 +108,12 @@ namespace CsProjEditor
         public void Save(string path)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Save(Root, path, Eol, Encoding);
+            Save(Root, path, EolString(Eol), Encoding);
         }
         public void Save(XElement root, string path)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Save(root, path, Eol, Encoding);
+            Save(root, path, EolString(Eol), Encoding);
         }
         public void Save(XElement root, string path, string eol, Encoding encoding)
         {
@@ -154,12 +160,12 @@ namespace CsProjEditor
         public void Insert(string name, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Insert(Root, name, key, value, Eol);
+            Insert(Root, name, key, value, EolString(Eol));
         }
         public void Insert(XElement root, string name, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Insert(root, name, key, value, Eol);
+            Insert(root, name, key, value, EolString(Eol));
         }
         public void Insert(XElement root, string name, string key, string value, string eol)
         {
@@ -175,7 +181,7 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace(csproj, $"<{name}>", elements.ToArray());
+            var space = GetIntentSpace($"<{name}>", elements.ToArray(), eol);
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
@@ -184,12 +190,12 @@ namespace CsProjEditor
         public void InsertAttribute(string name, string attribute, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(Root, name, attribute, key, value, Eol);
+            InsertAttribute(Root, name, attribute, key, value, EolString(Eol));
         }
         public void InsertAttribute(XElement root, string name, string attribute, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(root, name, attribute, key, value, Eol);
+            InsertAttribute(root, name, attribute, key, value, EolString(Eol));
         }
         public void InsertAttribute(XElement root, string name, string attribute, string key, string value, string eol)
         {
@@ -205,7 +211,7 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace(csproj, $"<{name}>", elements.ToArray());
+            var space = GetIntentSpace($"<{name}>", elements.ToArray(), eol);
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), eol, space);
@@ -220,12 +226,24 @@ namespace CsProjEditor
             return nsString;
         }
 
-        private string GetIntentSpace(string path, string element, string[] insideElement)
+        private string GetIntentSpace(string element, string[] insideElement, string Eol)
         {
-            var file = File.ReadAllLines(path);
-            var elementSpace = file.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
+            var entries = Root.ToString().Split(new[] { Eol }, StringSplitOptions.RemoveEmptyEntries);
+            var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
             var insideElementSpace = insideElement != null && insideElement.Any()
-                ? insideElement.Where(x => !x.Contains("\n")).SelectMany(y => file.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
+                ? insideElement.Where(x => !x.Contains(Eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
+                : 0;
+            var diff = insideElementSpace - elementSpace;
+            var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
+            return space;
+        }
+
+        private string GetIntentSpace(string path, string element, string[] insideElement, string Eol)
+        {
+            var entries = File.ReadAllLines(path);
+            var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
+            var insideElementSpace = insideElement != null && insideElement.Any()
+                ? insideElement.Where(x => !x.Contains(Eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
                 : 0;
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);

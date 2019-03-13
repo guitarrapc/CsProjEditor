@@ -11,48 +11,44 @@ namespace CsProjEditor
         private readonly int baseSpaceNum = 2;
 
         private readonly string csproj;
-        private readonly string pfx;
-        private readonly string thumbprint;
+        public string Eol { get; private set; }
+        public Encoding Encoding { get; private set; }
 
-        public CsProjEditor(string csproj, string pfx, string thumbprint)
+        public XElement Root { get; private set; }
+        public bool Initialized { get; private set; }
+
+        private CsProjEditor(string path)
         {
-            // 0: path_to_csproj 
-            // 1: pfx_file_name
-            // 2: pfx_thumbprint
-            this.csproj = csproj;
-            this.pfx = pfx;
-            this.thumbprint = thumbprint;
+            this.csproj = path;
         }
 
-        // MEMO: APP pfx and Package.StoreAssociation.xml should prepare/exists in advanced. (with manual relation on Visual Studio)
-        /// <summary>
-        /// TODO: Edit to make UWP Store associated csproj.
-        /// </summary>
-        public void Edit()
+        public static CsProjEditor Load(string path, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
-            if (!File.Exists(csproj)) return;
+            var editor = new CsProjEditor(path);
+            editor.Root = XElement.Load(path, options);
+            editor.Encoding = CsProjEditor.GetUtf8Encoding(path);
+            editor.Eol = CsProjEditor.GetEndOfLine(path);
+            editor.Initialized = true;
+            return editor;
+        }
 
-            // prepare
-            var encoding = GetUtf8Encoding(csproj);
-            var eol = GetEndOfLine(csproj);
-            var root = XElement.Load(csproj, LoadOptions.PreserveWhitespace);
+        public override string ToString()
+        {
             var declare = GetDeclaration(csproj);
 
-            // edit
-            Replace(root, "PropertyGroup", "PackageCertificateKeyFile", pfx);
-            Insert(root, "PropertyGroup", "PackageCertificateThumbprint", thumbprint);
-            Insert(root, "PropertyGroup", "GenerateAppInstallerFile", "False");
-            Insert(root, "PropertyGroup", "AppxAutoIncrementPackageRevision", "True");
-            Insert(root, "PropertyGroup", "AppxSymbolPackageEnabled", "False");
-            Insert(root, "PropertyGroup", "AppxBundle", "Always");
-            Insert(root, "PropertyGroup", "AppxBundlePlatforms", "x86");
-            Insert(root, "PropertyGroup", "AppInstallerUpdateFrequency", "1");
-            Insert(root, "PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
-            InsertAttribute(root, "ItemGroup", "None", "Include", pfx);
-            InsertAttribute(root, "ItemGroup", "None", "Include", "Package.StoreAssociation.xml");
-
-            // write
-            Write(root, csproj, declare, eol.letter, encoding);
+            // gen xml
+            string xml;
+            if (declare == null)
+            {
+                xml = Root.ToString();
+            }
+            else
+            {
+                xml = declare.ToString();
+                xml += Eol;
+                xml += Root.ToString();
+            }
+            return xml;
         }
 
         /// <summary>
@@ -63,7 +59,7 @@ namespace CsProjEditor
         /// </remarks>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static Encoding GetUtf8Encoding(string path)
+        public static Encoding GetUtf8Encoding(string path)
         {
             using (var reader = new FileStream(path, FileMode.Open))
             {
@@ -83,7 +79,7 @@ namespace CsProjEditor
         /// </remarks>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static (string letter, bool isCRLF) GetEndOfLine(string path)
+        public static string GetEndOfLine(string path)
         {
             using (var reader = new FileStream(path, FileMode.Open))
             {
@@ -93,19 +89,30 @@ namespace CsProjEditor
                     .Select((e, i) => (left: e, right: bits[i + 1]))
                     .Where(x => x.left == 13 && x.right == 10)
                     .Any();
-
-                return (isCRLF ? "\r\n" : "\n", isCRLF);
+                return isCRLF ? "\r\n" : "\n";
             }
         }
 
-        private static XDeclaration GetDeclaration(string path)
+        private XDeclaration GetDeclaration(string path)
         {
             var doc = XDocument.Load(path, LoadOptions.PreserveWhitespace);
             return doc.Declaration;
         }
 
-        public void Write(XElement root, string path, XDeclaration declare, string eol, Encoding encoding)
+        public void Save(string path)
         {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            Save(Root, path, Eol, Encoding);
+        }
+        public void Save(XElement root, string path)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            Save(root, path, Eol, Encoding);
+        }
+        public void Save(XElement root, string path, string eol, Encoding encoding)
+        {
+            var declare = GetDeclaration(csproj);
+
             // gen xml
             string xml;
             if (declare == null)
@@ -126,6 +133,10 @@ namespace CsProjEditor
             File.WriteAllBytes(path, bytes);
         }
 
+        public void Replace(string name, string key, string value)
+        {
+            Replace(Root, name, key, value);
+        }
         public void Replace(XElement root, string name, string key, string value)
         {
             var ns = root.Name.Namespace;
@@ -140,7 +151,17 @@ namespace CsProjEditor
             }
         }
 
+        public void Insert(string name, string key, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            Insert(Root, name, key, value, Eol);
+        }
         public void Insert(XElement root, string name, string key, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            Insert(root, name, key, value, Eol);
+        }
+        public void Insert(XElement root, string name, string key, string value, string eol)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -160,7 +181,17 @@ namespace CsProjEditor
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
 
+        public void InsertAttribute(string name, string attribute, string key, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            InsertAttribute(Root, name, attribute, key, value, Eol);
+        }
         public void InsertAttribute(XElement root, string name, string attribute, string key, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            InsertAttribute(root, name, attribute, key, value, Eol);
+        }
+        public void InsertAttribute(XElement root, string name, string attribute, string key, string value, string eol)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -177,7 +208,7 @@ namespace CsProjEditor
             var space = GetIntentSpace(csproj, $"<{name}>", elements.ToArray());
 
             // insert element
-            root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), "\n", space);
+            root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), eol, space);
         }
 
         private string GetNameSpace(XElement root, XNamespace ns)

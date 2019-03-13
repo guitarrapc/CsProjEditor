@@ -9,13 +9,14 @@ namespace CsProjEditor
     public class CsProjEditor
     {
         public enum EolType { CRLF, LF, }
-        private static Func<EolType, string> EolString = eol => eol == EolType.CRLF ? "\r\n" : "\n";
+
+        private static readonly Func<EolType, string> EolString = eol => eol == EolType.CRLF ? "\r\n" : "\n";
         private readonly int baseSpaceNum = 2;
 
         private readonly string csproj;
+
         public EolType Eol { get; private set; }
         public Encoding Encoding { get; private set; }
-
         public XElement Root { get; private set; }
         public bool Initialized { get; private set; }
 

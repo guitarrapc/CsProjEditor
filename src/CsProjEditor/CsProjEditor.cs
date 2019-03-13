@@ -37,21 +37,8 @@ namespace CsProjEditor
 
         public override string ToString()
         {
-            var declare = GetDeclaration(csproj);
-
-            // gen xml
-            string xml;
-            if (declare == null)
-            {
-                xml = Root.ToString();
-            }
-            else
-            {
-                xml = declare.ToString();
-                xml += EolString(Eol);
-                xml += Root.ToString();
-            }
-            return xml;
+            var eol = EolString(Eol);
+            return ToXmlString(Root, eol);
         }
 
         /// <summary>
@@ -114,22 +101,7 @@ namespace CsProjEditor
         }
         public void Save(XElement root, string path, string eol, Encoding encoding)
         {
-            var declare = GetDeclaration(csproj);
-
-            // gen xml
-            string xml;
-            if (declare == null)
-            {
-                xml = root.ToString();
-            }
-            else
-            {
-                xml = declare.ToString();
-                xml += eol;
-                xml += root.ToString();
-            }
-            // add line end
-            xml += eol;
+            var xml = ToXmlString(root, eol);
 
             // write
             var bytes = encoding.GetBytes(xml);
@@ -245,6 +217,27 @@ namespace CsProjEditor
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
             return space;
+        }
+
+        private string ToXmlString(XElement root, string eol)
+        {
+            var declare = GetDeclaration(csproj);
+
+            // gen xml
+            string xml;
+            if (declare == null)
+            {
+                xml = root.ToString();
+            }
+            else
+            {
+                xml = declare.ToString();
+                xml += eol;
+                xml += root.ToString();
+            }
+            // add line end
+            xml += eol;
+            return xml;
         }
     }
 }

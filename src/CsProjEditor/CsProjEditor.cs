@@ -177,7 +177,7 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace($"<{name}>", elements.ToArray(), eol);
+            var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
@@ -207,7 +207,7 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace($"<{name}>", elements.ToArray(), eol);
+            var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), eol, space);
@@ -222,9 +222,9 @@ namespace CsProjEditor
             return nsString;
         }
 
-        private string GetIntentSpace(string element, string[] insideElement, string eol)
+        private string GetIntentSpace(XElement root, string element, string[] insideElement, string eol)
         {
-            var entries = Root.ToString().Split(new[] { eol }, StringSplitOptions.RemoveEmptyEntries);
+            var entries = root.ToString().Split(new[] { eol }, StringSplitOptions.RemoveEmptyEntries);
             var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
             var insideElementSpace = insideElement != null && insideElement.Any()
                 ? insideElement.Where(x => !x.Contains(eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()

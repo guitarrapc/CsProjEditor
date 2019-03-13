@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsProjEditor\CsProjEditor.csproj" />
+    <ProjectReference Include="..\..\src\CsProjEditor\CsProjEditor.csproj" />
   </ItemGroup>
 
 </Project>

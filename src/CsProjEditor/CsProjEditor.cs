@@ -48,7 +48,7 @@ namespace CsProjEditor
             else
             {
                 xml = declare.ToString();
-                xml += Eol;
+                xml += EolString(Eol);
                 xml += Root.ToString();
             }
             return xml;

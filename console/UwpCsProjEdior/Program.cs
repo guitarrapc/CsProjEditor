@@ -19,36 +19,50 @@ namespace CsProjEditor.UwpCsProjEdior
 
     public class UwpCsProjEdior : BatchBase
     {
-        private readonly ILogger<UwpCsProjEdior> logger;
-        public UwpCsProjEdior(ILogger<UwpCsProjEdior> logger)
-        {
-            this.logger = logger;
-        }
-
         [Command("run")]
         public void Run(string path, string pfx, string thumbnail, string output, bool allowoverwrite = false)
         {
+            this.Context.Logger.LogInformation($"command: 'run'. Parameters are as follows.");
+            this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
+            this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
+            this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");
+            this.Context.Logger.LogInformation($"{nameof(output)}: {output}");
+            this.Context.Logger.LogInformation($"{nameof(allowoverwrite)}: {allowoverwrite}");
+            this.Context.Logger.LogInformation("\n");
+
             // run
+            this.Context.Logger.LogInformation($"begin editing csproj.");
             var csproj = CsProjEditor.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // save
+            this.Context.Logger.LogInformation($"saving generated csproj to {output}");
             if (File.Exists(output) && !allowoverwrite)
             {
                 throw new IOException($"Output path {output} already exists. Please use allowoverwrite to overwrite.");
             }
             csproj.Save(output);
-            logger.LogInformation($"Run complete, generated {output}");
+            this.Context.Logger.LogInformation($"complete! new csproj generated at {output}");
         }
 
         [Command("dryrun")]
         public void DryRun(string path, string pfx, string thumbnail)
         {
+            this.Context.Logger.LogInformation($"command: 'dryrun'. Parameters are as follows.");
+            this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
+            this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
+            this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");
+
+            // run
+            this.Context.Logger.LogInformation($"begin editing csproj\n");
             var csproj = CsProjEditor.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // output inmemory xml
-            logger.LogInformation(csproj.ToString());
+            this.Context.Logger.LogInformation("complete! generated csproj will be follows.");
+            this.Context.Logger.LogInformation("========== FROM HERE ==========");
+            this.Context.Logger.LogInformation(csproj.ToString());
+            this.Context.Logger.LogInformation("========== UNTIL HERE ==========");
         }
 
         private void Modify(CsProjEditor csproj, string pfx, string thumbnail)

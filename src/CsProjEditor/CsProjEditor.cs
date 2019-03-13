@@ -222,24 +222,24 @@ namespace CsProjEditor
             return nsString;
         }
 
-        private string GetIntentSpace(string element, string[] insideElement, string Eol)
+        private string GetIntentSpace(string element, string[] insideElement, string eol)
         {
-            var entries = Root.ToString().Split(new[] { Eol }, StringSplitOptions.RemoveEmptyEntries);
+            var entries = Root.ToString().Split(new[] { eol }, StringSplitOptions.RemoveEmptyEntries);
             var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
             var insideElementSpace = insideElement != null && insideElement.Any()
-                ? insideElement.Where(x => !x.Contains(Eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
+                ? insideElement.Where(x => !x.Contains(eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
                 : 0;
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
             return space;
         }
 
-        private string GetIntentSpace(string path, string element, string[] insideElement, string Eol)
+        private string GetIntentSpace(string path, string element, string[] insideElement, string eol)
         {
             var entries = File.ReadAllLines(path);
             var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
             var insideElementSpace = insideElement != null && insideElement.Any()
-                ? insideElement.Where(x => !x.Contains(Eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
+                ? insideElement.Where(x => !x.Contains(eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
                 : 0;
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);

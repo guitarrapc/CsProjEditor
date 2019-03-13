@@ -8,11 +8,7 @@ namespace CsProjEditor
 {
     public class CsProjEditor
     {
-        public enum EolType
-        {
-            CRLF,
-            LF,
-        }
+        public enum EolType { CRLF, LF, }
         private static Func<EolType, string> EolString = eol => eol == EolType.CRLF ? "\r\n" : "\n";
         private readonly int baseSpaceNum = 2;
 

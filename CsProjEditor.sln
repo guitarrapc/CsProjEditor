@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditor", "src\CsProjEditor\CsProjEditor.csproj", "{AC243839-8B7A-4483-9B22-3128F4C4431E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UwpCsProjEdior", "console\UwpCsProjEdior\UwpCsProjEdior.csproj", "{DF1F6370-C50B-4E72-8033-3941B142930A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UwpCsProjEditor", "console\UwpCsProjEditor\UwpCsProjEditor.csproj", "{DF1F6370-C50B-4E72-8033-3941B142930A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "console", "console", "{7F1CDE1E-F2C3-4F8C-8126-D5D5362838F7}"
 EndProject

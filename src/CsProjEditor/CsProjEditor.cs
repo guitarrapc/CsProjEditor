@@ -108,24 +108,6 @@ namespace CsProjEditor
             File.WriteAllBytes(path, bytes);
         }
 
-        public void Replace(string name, string key, string value)
-        {
-            Replace(Root, name, key, value);
-        }
-        public void Replace(XElement root, string name, string key, string value)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
-            if (!elementBase.Any()) return;
-
-            // replace
-            foreach (var item in elementBase)
-            {
-                item.Value = value;
-            }
-        }
-
         public void Insert(string name, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -154,6 +136,42 @@ namespace CsProjEditor
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
+        }
+
+        public void RemoveValue(string name, string key)
+        {
+            RemoveValue(Root, name, key);
+        }
+        public void RemoveValue(XElement root, string name, string key)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + name).Elements(ns + key);
+            if (!elementBase.Any()) return;
+
+            // remove
+            foreach (var item in elementBase)
+            {
+                item.Value = "";
+            }
+        }
+
+        public void ReplaceValue(string name, string key, string value)
+        {
+            ReplaceValue(Root, name, key, value);
+        }
+        public void ReplaceValue(XElement root, string name, string key, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
+            if (!elementBase.Any()) return;
+
+            // replace
+            foreach (var item in elementBase)
+            {
+                item.Value = value;
+            }
         }
 
         public void InsertAttribute(string name, string attribute, string key, string value)

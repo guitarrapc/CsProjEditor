@@ -20,11 +20,14 @@ namespace CsProjEditor
         public XElement Root { get; private set; }
         public bool Initialized { get; private set; }
 
-        private CsProjEditor(string path)
-        {
-            this.csproj = path;
-        }
+        private CsProjEditor(string path) => this.csproj = path;
 
+        /// <summary>
+        /// Load csproj from path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static CsProjEditor Load(string path, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
             var editor = new CsProjEditor(path);
@@ -40,6 +43,29 @@ namespace CsProjEditor
             var eol = EolString(Eol);
             return ToXmlString(Root, eol);
         }
+
+        private string ToXmlString(XElement root, string eol)
+        {
+            var declare = GetDeclaration(csproj);
+
+            // gen xml
+            string xml;
+            if (declare == null)
+            {
+                xml = root.ToString();
+            }
+            else
+            {
+                xml = declare.ToString();
+                xml += eol;
+                xml += root.ToString();
+            }
+            // add line end
+            xml += eol;
+            return xml;
+        }
+
+        #region File Operation
 
         /// <summary>
         /// determine utf8 contains bom from first 3 bytes of file.
@@ -83,12 +109,6 @@ namespace CsProjEditor
             }
         }
 
-        private XDeclaration GetDeclaration(string path)
-        {
-            var doc = XDocument.Load(path, LoadOptions.PreserveWhitespace);
-            return doc.Declaration;
-        }
-
         public void Save(string path)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -107,6 +127,10 @@ namespace CsProjEditor
             var bytes = encoding.GetBytes(xml);
             File.WriteAllBytes(path, bytes);
         }
+
+        #endregion
+
+        #region element operation
 
         public void Insert(string name, string key, string value)
         {
@@ -137,6 +161,10 @@ namespace CsProjEditor
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
+
+        #endregion
+
+        #region Value Operation
 
         public void RemoveValue(string name, string key)
         {
@@ -174,6 +202,10 @@ namespace CsProjEditor
             }
         }
 
+        #endregion
+
+        #region Attirbute Operation
+
         public void InsertAttribute(string name, string attribute, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -202,6 +234,15 @@ namespace CsProjEditor
 
             // insert element
             root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), eol, space);
+        }
+
+        #endregion
+
+        #region utils
+        private XDeclaration GetDeclaration(string path)
+        {
+            var doc = XDocument.Load(path, LoadOptions.PreserveWhitespace);
+            return doc.Declaration;
         }
 
         private string GetNameSpace(XElement root, XNamespace ns)
@@ -237,25 +278,6 @@ namespace CsProjEditor
             return space;
         }
 
-        private string ToXmlString(XElement root, string eol)
-        {
-            var declare = GetDeclaration(csproj);
-
-            // gen xml
-            string xml;
-            if (declare == null)
-            {
-                xml = root.ToString();
-            }
-            else
-            {
-                xml = declare.ToString();
-                xml += eol;
-                xml += root.ToString();
-            }
-            // add line end
-            xml += eol;
-            return xml;
-        }
+        #endregion
     }
 }

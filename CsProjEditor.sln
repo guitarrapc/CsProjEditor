@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditor", "src\CsProjEditor\CsProjEditor.csproj", "{AC243839-8B7A-4483-9B22-3128F4C4431E}"
 EndProject
@@ -13,7 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DF20F130-542
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{D4587483-FA1F-4F53-87B7-A0BF0E5EA9ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsProjEditor.ConsoleSample", "examples\CsProjEditor.ConsoleSample\CsProjEditor.ConsoleSample.csproj", "{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditor.ConsoleSample", "examples\CsProjEditor.ConsoleSample\CsProjEditor.ConsoleSample.csproj", "{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{46DBD981-C728-4190-B07A-6D939150D100}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsProjEditor.Tests", "tests\CsProjEditor.Tests\CsProjEditor.Tests.csproj", "{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,10 @@ Global
 		{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +49,7 @@ Global
 		{AC243839-8B7A-4483-9B22-3128F4C4431E} = {DF20F130-542A-47C9-A214-8B38E639B00B}
 		{DF1F6370-C50B-4E72-8033-3941B142930A} = {7F1CDE1E-F2C3-4F8C-8126-D5D5362838F7}
 		{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F} = {D4587483-FA1F-4F53-87B7-A0BF0E5EA9ED}
+		{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE} = {46DBD981-C728-4190-B07A-6D939150D100}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E693D77A-342B-425D-BD88-47DD78990F59}

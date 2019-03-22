@@ -130,19 +130,19 @@ namespace CsProjEditor
 
         #endregion
 
-        #region element operation
+        #region node operation
 
-        public void Insert(string name, string key, string value)
+        public void InsertNode(string name, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Insert(Root, name, key, value, EolString(Eol));
+            InsertNode(Root, name, key, value, EolString(Eol));
         }
-        public void Insert(XElement root, string name, string key, string value)
+        public void InsertNode(XElement root, string name, string key, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Insert(root, name, key, value, EolString(Eol));
+            InsertNode(root, name, key, value, EolString(Eol));
         }
-        public void Insert(XElement root, string name, string key, string value, string eol)
+        public void InsertNode(XElement root, string name, string key, string value, string eol)
         {
             var ns = root.Name.Namespace;
             // validation

@@ -23,14 +23,14 @@ namespace CsProjEditor.ConsoleSample
 
             // edit
             csproj.ReplaceValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
-            csproj.Insert("PropertyGroup", "PackageCertificateThumbprint", thumbprint);
-            csproj.Insert("PropertyGroup", "GenerateAppInstallerFile", "False");
-            csproj.Insert("PropertyGroup", "AppxAutoIncrementPackageRevision", "True");
-            csproj.Insert("PropertyGroup", "AppxSymbolPackageEnabled", "False");
-            csproj.Insert("PropertyGroup", "AppxBundle", "Always");
-            csproj.Insert("PropertyGroup", "AppxBundlePlatforms", "x86");
-            csproj.Insert("PropertyGroup", "AppInstallerUpdateFrequency", "1");
-            csproj.Insert("PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
+            csproj.InsertNode("PropertyGroup", "PackageCertificateThumbprint", thumbprint);
+            csproj.InsertNode("PropertyGroup", "GenerateAppInstallerFile", "False");
+            csproj.InsertNode("PropertyGroup", "AppxAutoIncrementPackageRevision", "True");
+            csproj.InsertNode("PropertyGroup", "AppxSymbolPackageEnabled", "False");
+            csproj.InsertNode("PropertyGroup", "AppxBundle", "Always");
+            csproj.InsertNode("PropertyGroup", "AppxBundlePlatforms", "x86");
+            csproj.InsertNode("PropertyGroup", "AppInstallerUpdateFrequency", "1");
+            csproj.InsertNode("PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
             csproj.InsertAttribute("ItemGroup", "None", "Include", pfx);
             csproj.InsertAttribute("ItemGroup", "None", "Include", "Package.StoreAssociation.xml");
 

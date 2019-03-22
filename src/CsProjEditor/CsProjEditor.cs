@@ -240,23 +240,26 @@ namespace CsProjEditor
 
         #region Value Operation
 
-        public void ReplaceValue(string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceValue(string name, string key, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, name, key, pattern, replacement, option);
+            ReplaceValue(Root, name, key, value, value, replacement, option);
         }
-        public void ReplaceValue(XElement root, string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceValue(string name, string key, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            ReplaceValue(Root, name, key, value, pattern, replacement, option);
+        }
+        public void ReplaceValue(XElement root, string name, string key, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             var ns = root.Name.Namespace;
             // validation
-            var elementBase = root.Elements(ns + name).Elements(ns + key);
+            var elementBase = root.Elements(ns + name).Elements(ns + key).Where(x => x.Value == value);
             if (!elementBase.Any()) return;
 
             // replace value
-            var origin = root.Element(ns + name).Element(ns + key);
-            var replaced = Regex.Replace(origin.Value, pattern, replacement, option);
-            if (replaced != origin.Value)
+            foreach (var item in elementBase)
             {
-                origin.Value = replaced;
+                var replaced = Regex.Replace(item.Value, pattern, replacement, option);
+                item.Value = replaced;
             }
         }
 

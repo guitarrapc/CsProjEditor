@@ -228,7 +228,40 @@ namespace CsProjEditor
             root.Element(ns + name).Element(ns + key).ReplaceAll();
         }
 
-        public void ReplaceValue(string name, string key, string value)
+        public void AppendValue(string name, string key, string value)
+        {
+            AppendValue(Root, name, key, value);
+        }
+        public void AppendValue(XElement root, string name, string key, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
+            if (!elementBase.Any()) return;
+
+            // append value
+            foreach (var item in elementBase)
+            {
+                item.Value += value;
+            }
+        }
+        public void PrependValue(string name, string key, string value)
+        {
+            PrependValue(Root, name, key, value);
+        }
+        public void PrependValue(XElement root, string name, string key, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
+            if (!elementBase.Any()) return;
+
+            // prepend value
+            foreach (var item in elementBase)
+            {
+                item.Value = value + item.Value;
+            }
+        }
         public void SetValue(string name, string key, string value)
         {
             SetValue(Root, name, key, value);

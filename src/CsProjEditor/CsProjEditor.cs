@@ -326,21 +326,21 @@ namespace CsProjEditor
 
         #region Attirbute Operation
 
-        public void InsertAttribute(string name, string attribute, string key, string value)
+        public void InsertAttribute(string name, string key, string attribute, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(Root, name, attribute, key, value, EolString(Eol));
+            InsertAttribute(Root, name, key, attribute, value, EolString(Eol));
         }
-        public void InsertAttribute(XElement root, string name, string attribute, string key, string value)
+        public void InsertAttribute(XElement root, string name, string key, string attribute, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(root, name, attribute, key, value, EolString(Eol));
+            InsertAttribute(root, name, key, attribute, value, EolString(Eol));
         }
-        public void InsertAttribute(XElement root, string name, string attribute, string key, string value, string eol)
+        public void InsertAttribute(XElement root, string name, string key, string attribute, string value, string eol)
         {
             var ns = root.Name.Namespace;
             // validation
-            var element = root.Elements(ns + name).Elements(ns + attribute).Where(x => x.FirstAttribute?.ToString() == value).Any();
+            var element = root.Elements(ns + name).Elements(ns + key).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").Any();
             if (element) return;
 
             // get space
@@ -352,8 +352,27 @@ namespace CsProjEditor
             }
             var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
 
-            // insert element
-            root.Element(ns + name).Add(space, new XElement(ns + attribute, new XAttribute(key, value)), eol, space);
+            // insert attribute
+            root.Element(ns + name).Add(space, new XElement(ns + key, new XAttribute(attribute, value)), eol, space);
+        }
+
+        public void RemoveAttribute(string name, string key, string attribute, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            RemoveAttribute(Root, name, key, attribute, value);
+        }
+        public void RemoveAttribute(XElement root, string name, string key, string attribute, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + name).Elements(ns + key).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").ToArray();
+            if (!elements.Any()) return;
+
+            // remove attribute
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Remove();
+            }
         }
 
         #endregion

@@ -19,13 +19,13 @@ Implementation
 * [x] Node: Insert
 * [x] Node: Replace
 * [x] Node: Remove
-* [x] Node: Value Set
-* [x] Node: Value Prepend
-* [x] Node: Value Apend
-* [x] Node: Value Replace
-* [x] Node: Value Remove
+* [x] NodeValue: Set
+* [x] NodeValue: Prepend
+* [x] NodeValue: Apend
+* [x] NodeValue: Replace
+* [x] NodeValue: Remove
 * [x] Attribute: Insert
-* [ ] Attribute: Remove
+* [x] Attribute: Remove
 * [ ] Attribute: Replace
 * [x] Load: load csproj as XPath
 * [x] Write: write with original utf8 encoding, keep BOM.

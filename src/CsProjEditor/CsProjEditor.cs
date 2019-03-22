@@ -383,6 +383,31 @@ namespace CsProjEditor
             }
         }
 
+        public void ReplaceAttribute(string name, string key, string attribute, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceAttribute(Root, name, key, attribute, value, value, replacement, option);
+        }
+        public void ReplaceAttribute(string name, string key, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceAttribute(Root, name, key, attribute, value, pattern, replacement, option);
+        }
+        public void ReplaceAttribute(XElement root, string name, string key, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + name).Elements(ns + key).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").ToArray();
+            if (!elements.Any()) return;
+
+            // replace attribute
+            foreach (var item in elements)
+            {
+                var replaced = Regex.Replace(item.FirstAttribute.Value, pattern, replacement);
+                item.SetAttributeValue(attribute, replaced);
+            }
+        }
+
         #endregion
 
         #region utils

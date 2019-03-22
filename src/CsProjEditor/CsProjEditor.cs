@@ -162,6 +162,53 @@ namespace CsProjEditor
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
 
+        public void RemoveNode(string name, string key, bool leaveBrankLine = false)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            RemoveNode(Root, name, key, EolString(Eol), leaveBrankLine);
+        }
+        public void RemoveNode(XElement root, string name, string key, bool leaveBrankLine = false)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            RemoveNode(root, name, key, EolString(Eol), leaveBrankLine);
+        }
+        public void RemoveNode(XElement root, string name, string key, string eol, bool leaveBrankLine)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements(ns + name).Elements(ns + key).ToArray();
+            if (!elementsBase.Any()) return;
+
+            if (leaveBrankLine)
+            {
+                // remove node, this leave node as brank line.
+                root.Element(ns + name).Element(ns + key).Remove();
+            }
+            else
+            {
+                // get space
+                var elements = elementsBase.Select(x => x?.ToString()).Where(x => x != null);
+                if (ns != null)
+                {
+                    var nsString = GetNameSpace(root, ns);
+                    elements = elements.Select(x => x.Replace(nsString, ""));
+                }
+                var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
+
+                // remove node and do not leave brank line.
+                // ReplaceAll Element to be nothing + Add removed elements
+                var parent = root.Element(ns + name).Element(ns + key);
+                var before = parent.ElementsBeforeSelf();
+                var after = parent.ElementsAfterSelf();
+                var removed = before.Concat(after).ToArray();
+                root.Element(ns + name).ReplaceAll(eol, space);
+                foreach (var item in removed)
+                {
+                    root.Element(ns + name).Add(space, item, eol, space);
+                }
+            }
+        }
+
         #endregion
 
         #region Value Operation

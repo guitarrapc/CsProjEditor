@@ -163,6 +163,11 @@ namespace CsProjEditor
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
 
+        public void ReplaceNode(string name, string key, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, name, key, key, replacement, option);
+        }
         public void ReplaceNode(string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");

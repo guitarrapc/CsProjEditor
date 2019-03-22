@@ -213,6 +213,23 @@ namespace CsProjEditor
 
         #region Value Operation
 
+        public void ReplaceValue(string name, string key, string pattern, string replacement)
+        {
+            ReplaceValue(Root, name, key, pattern, replacement);
+        }
+        public void ReplaceValue(XElement root, string name, string key, string pattern, string replacement)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + name).Elements(ns + key);
+            if (!elementBase.Any()) return;
+
+            // replace value
+            var origin = root.Element(ns + name).Element(ns + key);
+            var value = Regex.Replace(origin.Value, pattern, replacement);
+            origin.Value = value;
+        }
+
         public void RemoveValue(string name, string key)
         {
             RemoveValue(Root, name, key);

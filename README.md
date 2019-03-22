@@ -13,15 +13,20 @@ Implementation
 
 * [x] Detect: EOL
 * [x] Detect: UTF8 BOM
-* [x] Detect: Space for each element
+* [x] Detect: Space for each node
 * [x] Detect: NameSpace (for old csproj, equivalent for new csproj)
 * [x] Detect: Declaration (for old csproj, equivalent for new csproj)
-* [x] Element: Insert
-* [ ] Element: Remove
-* [x] Element: Value Replace
+* [x] Node: Insert
+* [ ] Node: Replace
+* [x] Node: Remove
+* [x] Node: Value Set
+* [x] Node: Value Prepend
+* [x] Node: Value Apend
+* [x] Node: Value Replace
+* [x] Node: Value Remove
 * [x] Attribute: Insert
 * [ ] Attribute: Remove
-* [ ] Attribute: Value Replace
+* [ ] Attribute: Replace
 * [x] Load: load csproj as XPath
 * [x] Write: write with original utf8 encoding, keep BOM.
 * [x] Write: add empty line if last line is value.

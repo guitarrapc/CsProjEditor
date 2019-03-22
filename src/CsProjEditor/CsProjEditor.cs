@@ -158,7 +158,7 @@ namespace CsProjEditor
             }
             var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
 
-            // insert element
+            // insert node
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
 
@@ -177,11 +177,8 @@ namespace CsProjEditor
             var elementBase = root.Elements(ns + name).Elements(ns + key);
             if (!elementBase.Any()) return;
 
-            // remove
-            foreach (var item in elementBase)
-            {
-                item.Value = "";
-            }
+            // remove value
+            root.Element(ns + name).Element(ns + key).ReplaceAll();
         }
 
         public void ReplaceValue(string name, string key, string value)
@@ -195,7 +192,7 @@ namespace CsProjEditor
             var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
             if (!elementBase.Any()) return;
 
-            // replace
+            // replace value
             foreach (var item in elementBase)
             {
                 item.Value = value;

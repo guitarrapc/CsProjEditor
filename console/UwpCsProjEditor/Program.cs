@@ -68,7 +68,7 @@ namespace CsProjEditor.UwpCsProjEdior
         private void Modify(CsProjEditor csproj, string pfx, string thumbnail)
         {
             // edit
-            csproj.ReplaceValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
+            csproj.SetValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
             csproj.InsertNode("PropertyGroup", "PackageCertificateThumbprint", thumbnail);
             csproj.InsertNode("PropertyGroup", "GenerateAppInstallerFile", "False");
             csproj.InsertNode("PropertyGroup", "AppxAutoIncrementPackageRevision", "True");

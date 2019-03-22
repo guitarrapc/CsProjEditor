@@ -229,17 +229,18 @@ namespace CsProjEditor
         }
 
         public void ReplaceValue(string name, string key, string value)
+        public void SetValue(string name, string key, string value)
         {
-            ReplaceValue(Root, name, key, value);
+            SetValue(Root, name, key, value);
         }
-        public void ReplaceValue(XElement root, string name, string key, string value)
+        public void SetValue(XElement root, string name, string key, string value)
         {
             var ns = root.Name.Namespace;
             // validation
             var elementBase = root.Elements(ns + name).Elements(ns + key).ToArray();
             if (!elementBase.Any()) return;
 
-            // replace value
+            // set value
             foreach (var item in elementBase)
             {
                 item.Value = value;

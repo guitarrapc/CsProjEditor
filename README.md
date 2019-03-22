@@ -17,7 +17,7 @@ Implementation
 * [x] Detect: NameSpace (for old csproj, equivalent for new csproj)
 * [x] Detect: Declaration (for old csproj, equivalent for new csproj)
 * [x] Node: Insert
-* [ ] Node: Replace
+* [x] Node: Replace
 * [x] Node: Remove
 * [x] Node: Value Set
 * [x] Node: Value Prepend

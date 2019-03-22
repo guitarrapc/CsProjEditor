@@ -163,6 +163,27 @@ namespace CsProjEditor
             root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
         }
 
+        public void ReplaceNode(string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, name, key, pattern, replacement, option);
+        }
+        public void ReplaceNode(XElement root, string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements(ns + name).Elements(ns + key).ToArray();
+            if (!elementsBase.Any()) return;
+
+            // replace node.
+            var origin = root.Element(ns + name).Element(ns + key);
+            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
+            if (origin.Name.LocalName != replaced)
+            {
+                origin.Name = ns + replaced;
+            }
+        }
+
         public void RemoveNode(string name, string key, bool leaveBrankLine = false)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -227,8 +248,11 @@ namespace CsProjEditor
 
             // replace value
             var origin = root.Element(ns + name).Element(ns + key);
-            var value = Regex.Replace(origin.Value, pattern, replacement, option);
-            origin.Value = value;
+            var replaced = Regex.Replace(origin.Value, pattern, replacement, option);
+            if (replaced != origin.Value)
+            {
+                origin.Value = replaced;
+            }
         }
 
         public void RemoveValue(string name, string key)

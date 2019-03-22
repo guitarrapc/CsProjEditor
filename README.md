@@ -26,7 +26,7 @@ Implementation
 * [x] NodeValue: Remove
 * [x] Attribute: Insert
 * [x] Attribute: Remove
-* [ ] Attribute: Replace
+* [x] Attribute: Replace
 * [x] Load: load csproj as XPath
 * [x] Write: write with original utf8 encoding, keep BOM.
 * [x] Write: add empty line if last line is value.

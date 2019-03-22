@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace CsProjEditor
@@ -213,11 +214,11 @@ namespace CsProjEditor
 
         #region Value Operation
 
-        public void ReplaceValue(string name, string key, string pattern, string replacement)
+        public void ReplaceValue(string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, name, key, pattern, replacement);
+            ReplaceValue(Root, name, key, pattern, replacement, option);
         }
-        public void ReplaceValue(XElement root, string name, string key, string pattern, string replacement)
+        public void ReplaceValue(XElement root, string name, string key, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -226,7 +227,7 @@ namespace CsProjEditor
 
             // replace value
             var origin = root.Element(ns + name).Element(ns + key);
-            var value = Regex.Replace(origin.Value, pattern, replacement);
+            var value = Regex.Replace(origin.Value, pattern, replacement, option);
             origin.Value = value;
         }
 

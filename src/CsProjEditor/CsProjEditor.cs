@@ -144,17 +144,6 @@ namespace CsProjEditor
             var elementsBase = root.Elements(ns + group).Elements(ns + node);
             return elementsBase.Any();
         }
-        public bool ExistsNode(string group, string node, string value)
-        {
-            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            return ExistsNode(Root, group, node, value);
-        }
-        public bool ExistsNode(XElement root, string group, string node, string value)
-        {
-            var ns = root.Name.Namespace;
-            var elementsBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value);
-            return elementsBase.Any();
-        }
 
         public void InsertNode(string group, string node, string value)
         {
@@ -261,7 +250,19 @@ namespace CsProjEditor
 
         #endregion
 
-        #region Value Operation
+        #region node value operation
+
+        public bool ExistsNodeValue(string group, string node, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return ExistsNodeValue(Root, group, node, value);
+        }
+        public bool ExistsNodeValue(XElement root, string group, string node, string value)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value);
+            return elementsBase.Any();
+        }
 
         public void ReplaceValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
@@ -355,7 +356,7 @@ namespace CsProjEditor
 
         #endregion
 
-        #region Attirbute Operation
+        #region attirbute operation
 
         public void InsertAttribute(string group, string node, string attribute, string value)
         {

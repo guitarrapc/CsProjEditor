@@ -16,14 +16,17 @@ Implementation
 * [x] Detect: Space for each node
 * [x] Detect: NameSpace (for old csproj, equivalent for new csproj)
 * [x] Detect: Declaration (for old csproj, equivalent for new csproj)
+* [x] Node: Exists
 * [x] Node: Insert
 * [x] Node: Replace
 * [x] Node: Remove
+* [x] NodeValue: Exists
 * [x] NodeValue: Set
 * [x] NodeValue: Prepend
 * [x] NodeValue: Apend
 * [x] NodeValue: Replace
 * [x] NodeValue: Remove
+* [x] Attribute: Exists
 * [x] Attribute: Insert
 * [x] Attribute: Remove
 * [x] Attribute: Replace

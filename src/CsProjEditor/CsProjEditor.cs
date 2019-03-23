@@ -160,7 +160,7 @@ namespace CsProjEditor
             var space = GetIntentSpace(root, $"<{name}>", elements.ToArray(), eol);
 
             // insert node
-            root.Element(ns + name).Add(space, new XElement(ns + key, value), "\n", space);
+            root.Element(ns + name).Add(space, new XElement(ns + key, value), eol, space);
         }
 
         public void ReplaceNode(string name, string key, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)

@@ -358,6 +358,19 @@ namespace CsProjEditor
 
         #region attirbute operation
 
+        public bool ExistsAttribute(string group, string node, string attribute, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return ExistsAttribute(Root, group, node, attribute, value);
+        }
+        public bool ExistsAttribute(XElement root, string group, string node, string attribute, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value);
+            return element.Any();
+        }
+
         public void InsertAttribute(string group, string node, string attribute, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -372,7 +385,7 @@ namespace CsProjEditor
         {
             var ns = root.Name.Namespace;
             // validation
-            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").Any();
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).Any();
             if (element) return;
 
             // get space
@@ -397,7 +410,7 @@ namespace CsProjEditor
         {
             var ns = root.Name.Namespace;
             // validation
-            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").ToArray();
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
             if (!elements.Any()) return;
 
             // remove attribute
@@ -421,7 +434,7 @@ namespace CsProjEditor
         {
             var ns = root.Name.Namespace;
             // validation
-            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x.FirstAttribute?.ToString() == $"{attribute}=\"{value}\"").ToArray();
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
             if (!elements.Any()) return;
 
             // replace attribute

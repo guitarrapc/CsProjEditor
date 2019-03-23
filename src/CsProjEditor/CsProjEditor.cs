@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -485,6 +486,48 @@ namespace CsProjEditor
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
             return space;
+        }
+
+        #endregion
+
+        #region linq operation
+
+        public struct NodeFilter
+        {
+            public readonly string GroupName;
+            public readonly string NodeName;
+            public readonly string NodeValue;
+            public readonly IEnumerable<string> AttributeNames;
+            public readonly IEnumerable<string> AttributeValues;
+
+            public NodeFilter(string groupName, string nodeName, string nodeValue, IEnumerable<string> attributeNames, IEnumerable<string> attributeValues)
+                => (GroupName, NodeName, NodeValue, AttributeNames, AttributeValues) = (groupName, nodeName, nodeValue, attributeNames, attributeValues);
+        }
+
+        public IEnumerable<XElement> Filter(Func<NodeFilter, bool> predicate)
+        {
+            return Filter(Root, predicate);
+        }
+        public IEnumerable<XElement> Filter(XElement root, Func<NodeFilter, bool> predicate)
+        {
+            if (root == null) throw new ArgumentNullException(nameof(root));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            foreach (var group in root.Elements())
+            {
+                foreach (var node in group.Elements())
+                {
+                    var arg = new NodeFilter(
+                        group.Name.LocalName,
+                        node.Name.LocalName,
+                        node.Value,
+                        node?.Attributes().Select(x => x?.Name?.LocalName),
+                        node?.Attributes().Select(x => x?.Value)
+                    );
+                    if (!predicate(arg)) continue;
+                    yield return node;
+                }
+            }
         }
 
         #endregion

@@ -16,6 +16,7 @@ Implementation
 * [x] Detect: Space for each node
 * [x] Detect: NameSpace (for old csproj, equivalent for new csproj)
 * [x] Detect: Declaration (for old csproj, equivalent for new csproj)
+* [x] Filter: filter node, nodevalue and attribute and pass as XElement
 * [x] Node: Exists
 * [x] Node: Insert
 * [x] Node: Replace

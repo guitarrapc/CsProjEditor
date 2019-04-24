@@ -372,17 +372,17 @@ namespace CsProjEditor
             return element.Any();
         }
 
-        public void InsertAttribute(string group, string node, string attribute, string value)
+        public void InsertAttribute(string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(Root, group, node, attribute, value, EolString(Eol));
+            InsertAttribute(Root, group, node, attribute, value, EolString(Eol), filterElement);
         }
-        public void InsertAttribute(XElement root, string group, string node, string attribute, string value)
+        public void InsertAttribute(XElement root, string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(root, group, node, attribute, value, EolString(Eol));
+            InsertAttribute(root, group, node, attribute, value, EolString(Eol), filterElement);
         }
-        public void InsertAttribute(XElement root, string group, string node, string attribute, string value, string eol)
+        public void InsertAttribute(XElement root, string group, string node, string attribute, string value, string eol, Func<XElement, bool> filterElement)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -390,7 +390,7 @@ namespace CsProjEditor
             if (element) return;
 
             // get space
-            var elements = root.Element(ns + group).Elements().Select(x => x?.ToString()).Where(x => x != null);
+            var elements = root.Elements(ns + group).Where(filterElement).FirstOrDefault()?.Elements().Select(x => x?.ToString()).Where(x => x != null);
             if (ns != null)
             {
                 var nsString = GetNameSpace(root, ns);
@@ -469,11 +469,25 @@ namespace CsProjEditor
             var entries = root.ToString().Split(new[] { eol }, StringSplitOptions.RemoveEmptyEntries);
             var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
             var insideElementSpace = insideElement != null && insideElement.Any()
-                ? insideElement.Where(x => !x.Contains(eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
+                ? GetBase(entries, insideElement, eol)
                 : 0;
             var diff = insideElementSpace - elementSpace;
             var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
             return space;
+        }
+
+        private int GetBase(string[] entries, string[] insideElement, string eol)
+        {
+            var matchElements = insideElement.Where(x => !x.Contains(eol)).ToArray();
+            if (matchElements.Any())
+            {
+                var result = matchElements.SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min();
+                return result;
+            }
+            else
+            {
+                return baseSpaceNum;
+            }
         }
 
         private string GetIntentSpace(string path, string element, string[] insideElement, string eol)

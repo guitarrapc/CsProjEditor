@@ -122,8 +122,7 @@ namespace CsProjEditor
             {
                 var bytes = new byte[3];
                 reader.Read(bytes, 0, 3);
-                var isBom = bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
-                return new System.Text.UTF8Encoding(isBom);
+                return GetUtf8Encoding(bytes);
             }
         }
         public static Encoding GetUtf8Encoding(byte[] bytes)

@@ -7,13 +7,19 @@ using System.Xml.Linq;
 
 namespace CsProjEditor
 {
-    internal static class Utils
+    internal static class XmlUtils
     {
         private static readonly int baseSpaceNum = 2;
 
-        public static XDeclaration GetDeclaration(string path)
+        public static XDeclaration GetDeclarationFromPath(string path)
         {
             var doc = XDocument.Load(path, LoadOptions.PreserveWhitespace);
+            return doc.Declaration;
+        }
+
+        public static XDeclaration GetDeclarationFromXml(string xml)
+        {
+            var doc = XDocument.Parse(xml, LoadOptions.PreserveWhitespace);
             return doc.Declaration;
         }
 

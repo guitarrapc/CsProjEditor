@@ -5,20 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using static CsProjEditor.Utils;
+using static CsProjEditor.XmlUtils;
 
 namespace CsProjEditor
 {
     public class CsProjEditor
     {
-        private readonly string csproj;
+        private readonly string _path;
+        private readonly string _xml;
 
         public EolType Eol { get; private set; }
         public Encoding Encoding { get; private set; }
         public XElement Root { get; private set; }
         public bool Initialized { get; private set; }
 
-        private CsProjEditor(string path) => this.csproj = path;
+        private CsProjEditor(string path, string xml) => (_path, _xml) = (path, xml);
 
         /// <summary>
         /// Load csproj from path
@@ -28,10 +29,32 @@ namespace CsProjEditor
         /// <returns></returns>
         public static CsProjEditor Load(string path, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
-            var editor = new CsProjEditor(path);
+            var editor = new CsProjEditor(path, File.ReadAllText(path));
             editor.Root = XElement.Load(path, options);
             editor.Encoding = CsProjEditor.GetUtf8Encoding(path);
             editor.Eol = CsProjEditor.GetEndOfLine(path);
+            editor.Initialized = true;
+            return editor;
+        }
+
+        /// <summary>
+        /// Load csproj from path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static CsProjEditor Load(Stream stream, LoadOptions options = LoadOptions.PreserveWhitespace)
+        {
+            string xml = "";
+            using (var reader = new StreamReader(stream))
+            {
+                xml = reader.ReadToEnd();
+                if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+            }
+            var editor = new CsProjEditor("", xml);
+            editor.Root = XElement.Parse(xml, options);
+            editor.Encoding = CsProjEditor.GetUtf8EncodingFromXml(xml);
+            editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
             editor.Initialized = true;
             return editor;
         }
@@ -44,7 +67,7 @@ namespace CsProjEditor
 
         private string ToXmlString(XElement root, string eol)
         {
-            var declare = GetDeclaration(csproj);
+            var declare = GetDeclarationFromXml(_xml);
 
             // gen xml
             string xml;
@@ -83,6 +106,19 @@ namespace CsProjEditor
                 return new System.Text.UTF8Encoding(isBom);
             }
         }
+        public static Encoding GetUtf8Encoding(Stream stream)
+        {
+            var bits = new byte[3];
+            stream.Read(bits, 0, 3);
+            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
+            return new System.Text.UTF8Encoding(isBom);
+        }
+        public static Encoding GetUtf8EncodingFromXml(string xml)
+        {
+            var bits = xml.Take(3).Select(x => Convert.ToByte(x)).ToArray();
+            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
+            return new System.Text.UTF8Encoding(isBom);
+        }
 
         /// <summary>
         /// check file contains crlf or not.
@@ -105,6 +141,25 @@ namespace CsProjEditor
                     .Any();
                 return isCRLF ? EolType.CRLF : EolType.LF;
             }
+        }
+        public static EolType GetEndOfLine(Stream stream)
+        {
+            var bits = new byte[1024];
+            stream.Read(bits, 0, 1024);
+            var isCRLF = bits.Where((e, i) => i < bits.Length - 1)
+                .Select((e, i) => (left: e, right: bits[i + 1]))
+                .Where(x => x.left == 13 && x.right == 10)
+                .Any();
+            return isCRLF ? EolType.CRLF : EolType.LF;
+        }
+        public static EolType GetEndOfLineFromXml(string xml)
+        {
+            var bits = xml.Take(1024).Select(x => Convert.ToByte(x)).ToArray();
+            var isCRLF = bits.Where((e, i) => i < bits.Length - 1)
+                .Select((e, i) => (left: e, right: bits[i + 1]))
+                .Where(x => x.left == 13 && x.right == 10)
+                .Any();
+            return isCRLF ? EolType.CRLF : EolType.LF;
         }
 
         /// <summary>

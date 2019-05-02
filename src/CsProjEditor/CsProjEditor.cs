@@ -74,12 +74,14 @@ namespace CsProjEditor
             if (declare == null)
             {
                 xml = root.ToString();
+                xml = xml.Replace(EolType.CRLF.ToEolString(), eol);
             }
             else
             {
                 xml = declare.ToString();
                 xml += eol;
                 xml += root.ToString();
+                xml = xml.Replace(EolType.CRLF.ToEolString(), eol);
             }
             // add line end
             xml += eol;

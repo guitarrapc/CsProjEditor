@@ -8,7 +8,7 @@ using Xunit;
 
 namespace CsProjEditor.Tests
 {
-    public class CsProjEditorUtf8CRLFUnitTests //: IDisposable
+    public class FileTest //: IDisposable
     {
         private readonly string tempFolder;
         private readonly List<string> tempPaths = new List<string>();
@@ -50,6 +50,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatPathLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -66,11 +68,15 @@ namespace CsProjEditor.Tests
 
             // Initialized Should be true
             csproj.Initialized.Should().BeTrue();
+
+            // TODO: Save test
         }
 
         [Theory]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatStreamLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -89,6 +95,8 @@ namespace CsProjEditor.Tests
 
                 // Initialized Should be true
                 csproj.Initialized.Should().BeTrue();
+
+                // TODO: Save test
             }
         }
 
@@ -111,6 +119,8 @@ namespace CsProjEditor.Tests
 
             // Initialized Should be true
             csproj.Initialized.Should().BeTrue();
+
+            // TODO: Save test
         }
 
         [Theory]
@@ -134,6 +144,8 @@ namespace CsProjEditor.Tests
 
                 // Initialized Should be true
                 csproj.Initialized.Should().BeTrue();
+
+                // TODO: Save test
             }
         }
 

@@ -17,10 +17,18 @@ namespace CsProjEditor.Tests
         {
             var csproj = CsProjEditor.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
-            csproj.ExistsNode("PropertyGroup", "HogemogeNotExists").Should().BeFalse();
             csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ExistsNode("ItemGroup", "HogemogeNotExists").Should().BeFalse();
             csproj.ExistsNode("Target", "Copy").Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void ExistsFailTest(string csprojPath)
+        {
+            var csproj = CsProjEditor.Load(csprojPath);
+            csproj.ExistsNode("PropertyGroup", "HogemogeNotExists").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "HogemogeNotExists").Should().BeFalse();
             csproj.ExistsNode("Target", "HogemogeNotExists").Should().BeFalse();
         }
 
@@ -106,6 +114,19 @@ namespace CsProjEditor.Tests
             csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeFalse();
             // remove blankline will remove all blank line. In this case, previous remove's blank line also removed.
             csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length.Should().Be(beforeCount - 1 - 1);
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void RemoveFailTest(string csprojPath)
+        {
+            var csproj = CsProjEditor.Load(csprojPath);
+
+            // not exists node will not do any.
+            var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
+            csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
+            csproj.RemoveNode("PropertyGroup", "Hogemoge", true);
         }
     }
 }

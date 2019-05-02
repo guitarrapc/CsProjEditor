@@ -8,45 +8,8 @@ using Xunit;
 
 namespace CsProjEditor.Tests
 {
-    public class FileTest //: IDisposable
+    public class FileTest
     {
-        private readonly string tempFolder;
-        private readonly List<string> tempPaths = new List<string>();
-
-        ///// <summary>
-        ///// Setup
-        ///// </summary>
-        //public CsProjEditorUtf8CRLFUnitTests()
-        //{
-        //    // ready temp folder
-        //    var testData = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "testdata"), "*.*proj");
-        //    var tempFolder = Path.Combine(Path.GetTempPath(), nameof(CsProjEditorUtf8CRLFUnitTests));
-        //    if (!Directory.Exists(tempFolder))
-        //        Directory.CreateDirectory(tempFolder);
-        //    this.tempFolder = tempFolder;
-
-        //    // Copy csproj to temp
-        //    foreach (var item in testData)
-        //    {
-        //        // Gen temp path
-        //        var temp = Path.Combine(tempFolder, Path.GetFileName(item));
-        //        tempPaths.Add(temp);
-        //        if (!File.Exists(temp))
-        //        {
-        //            File.Copy(item, temp, true);
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Teardown
-        ///// </summary>
-        //public void Dispose()
-        //{
-        //    // Remove temp path
-        //    Directory.Delete(tempFolder, true);
-        //}
-
         [Theory]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8LF.csproj", EolType.LF, "\n")]

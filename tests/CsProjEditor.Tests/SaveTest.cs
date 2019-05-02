@@ -8,7 +8,7 @@ using Xunit;
 
 namespace CsProjEditor.Tests
 {
-    public class SaveTest //: IDisposable
+    public class SaveTest : IDisposable
     {
         private readonly string tempFolder;
         private readonly List<string> tempPaths = new List<string>();

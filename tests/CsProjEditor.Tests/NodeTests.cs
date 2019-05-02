@@ -8,11 +8,8 @@ using Xunit;
 
 namespace CsProjEditor.Tests
 {
-    public class NodeTests //: IDisposable
+    public class NodeTests
     {
-        private readonly string tempFolder;
-        private readonly List<string> tempPaths = new List<string>();
-
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]

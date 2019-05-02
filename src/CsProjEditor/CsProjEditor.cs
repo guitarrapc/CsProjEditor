@@ -38,25 +38,43 @@ namespace CsProjEditor
         }
 
         /// <summary>
-        /// Load csproj from path
+        /// Load csproj from stream
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="stream"></param>
         /// <param name="options"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
         public static CsProjEditor Load(Stream stream, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
-            string xml = "";
-            using (var reader = new StreamReader(stream))
+            StreamReader streamReader = null;
+            BinaryReader binaryReader = null;
+            try
             {
-                xml = reader.ReadToEnd();
+                string xml = "";
+                // no `using statement` to re-use stream
+                // manual read stream to get string
+                streamReader = new StreamReader(stream);
+                xml = streamReader.ReadToEnd();
                 if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+
+                // manual read stream as binary to get bom
+                byte[] bytes = new byte[3];
+                binaryReader = new BinaryReader(stream);
+                binaryReader.Read(bytes, 0, 3);
+                if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+
+                var editor = new CsProjEditor("", xml);
+                editor.Root = XElement.Parse(xml, options);
+                editor.Encoding = GetUtf8Encoding(bytes);
+                editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
+                editor.Initialized = true;
+                return editor;
             }
-            var editor = new CsProjEditor("", xml);
-            editor.Root = XElement.Parse(xml, options);
-            editor.Encoding = CsProjEditor.GetUtf8EncodingFromXml(xml);
-            editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
-            editor.Initialized = true;
-            return editor;
+            finally
+            {
+                streamReader?.Close();
+                binaryReader?.Close();
+            }
         }
 
         public override string ToString()
@@ -100,25 +118,17 @@ namespace CsProjEditor
         /// <returns></returns>
         public static Encoding GetUtf8Encoding(string path)
         {
-            using (var reader = new FileStream(path, FileMode.Open))
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                var bits = new byte[3];
-                reader.Read(bits, 0, 3);
-                var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
+                var bytes = new byte[3];
+                reader.Read(bytes, 0, 3);
+                var isBom = bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
                 return new System.Text.UTF8Encoding(isBom);
             }
         }
-        public static Encoding GetUtf8Encoding(Stream stream)
+        public static Encoding GetUtf8Encoding(byte[] bytes)
         {
-            var bits = new byte[3];
-            stream.Read(bits, 0, 3);
-            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
-            return new System.Text.UTF8Encoding(isBom);
-        }
-        public static Encoding GetUtf8EncodingFromXml(string xml)
-        {
-            var bits = xml.Take(3).Select(x => Convert.ToByte(x)).ToArray();
-            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
+            var isBom = bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
             return new System.Text.UTF8Encoding(isBom);
         }
 
@@ -133,7 +143,7 @@ namespace CsProjEditor
         /// <returns></returns>
         public static EolType GetEndOfLine(string path)
         {
-            using (var reader = new FileStream(path, FileMode.Open))
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 var bits = new byte[1024];
                 reader.Read(bits, 0, 1024);

@@ -372,15 +372,15 @@ namespace CsProjEditor
         /// <param name="value"></param>
         /// <param name="replacement"></param>
         /// <param name="option"></param>
-        public void ReplaceValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, group, node, value, value, replacement, option);
+            ReplaceNodeValue(Root, group, node, value, value, replacement, option);
         }
-        public void ReplaceValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, group, node, value, pattern, replacement, option);
+            ReplaceNodeValue(Root, group, node, value, pattern, replacement, option);
         }
-        public void ReplaceValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -400,11 +400,11 @@ namespace CsProjEditor
         /// </summary>
         /// <param name="group"></param>
         /// <param name="node"></param>
-        public void RemoveValue(string group, string node)
+        public void RemoveNodeValue(string group, string node)
         {
-            RemoveValue(Root, group, node);
+            RemoveNodeValue(Root, group, node);
         }
-        public void RemoveValue(XElement root, string group, string node)
+        public void RemoveNodeValue(XElement root, string group, string node)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -421,11 +421,11 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="value"></param>
-        public void AppendValue(string group, string node, string value)
+        public void AppendNodeValue(string group, string node, string value)
         {
-            AppendValue(Root, group, node, value);
+            AppendNodeValue(Root, group, node, value);
         }
-        public void AppendValue(XElement root, string group, string node, string value)
+        public void AppendNodeValue(XElement root, string group, string node, string value)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -444,11 +444,11 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="value"></param>
-        public void PrependValue(string group, string node, string value)
+        public void PrependNodeValue(string group, string node, string value)
         {
-            PrependValue(Root, group, node, value);
+            PrependNodeValue(Root, group, node, value);
         }
-        public void PrependValue(XElement root, string group, string node, string value)
+        public void PrependNodeValue(XElement root, string group, string node, string value)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -467,11 +467,11 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="value"></param>
-        public void SetValue(string group, string node, string value)
+        public void SetNodeValue(string group, string node, string value)
         {
-            SetValue(Root, group, node, value);
+            SetNodeValue(Root, group, node, value);
         }
-        public void SetValue(XElement root, string group, string node, string value)
+        public void SetNodeValue(XElement root, string group, string node, string value)
         {
             var ns = root.Name.Namespace;
             // validation

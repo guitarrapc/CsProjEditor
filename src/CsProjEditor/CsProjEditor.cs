@@ -5,16 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static CsProjEditor.Utils;
 
 namespace CsProjEditor
 {
     public class CsProjEditor
     {
-        public enum EolType { CRLF, LF, }
-
-        private static readonly Func<EolType, string> EolString = eol => eol == EolType.CRLF ? "\r\n" : "\n";
-        private readonly int baseSpaceNum = 2;
-
         private readonly string csproj;
 
         public EolType Eol { get; private set; }
@@ -42,7 +38,7 @@ namespace CsProjEditor
 
         public override string ToString()
         {
-            var eol = EolString(Eol);
+            var eol = Eol.ToEolString();
             return ToXmlString(Root, eol);
         }
 
@@ -111,15 +107,19 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Save to destination path
+        /// </summary>
+        /// <param name="path"></param>
         public void Save(string path)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Save(Root, path, EolString(Eol), Encoding);
+            Save(Root, path, Eol.ToEolString(), Encoding);
         }
         public void Save(XElement root, string path)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            Save(root, path, EolString(Eol), Encoding);
+            Save(root, path, Eol.ToEolString(), Encoding);
         }
         public void Save(XElement root, string path, string eol, Encoding encoding)
         {
@@ -134,6 +134,12 @@ namespace CsProjEditor
 
         #region node operation
 
+        /// <summary>
+        /// Check node is exists or not
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public bool ExistsNode(string group, string node)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -146,15 +152,21 @@ namespace CsProjEditor
             return elementsBase.Any();
         }
 
+        /// <summary>
+        /// Insert node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
         public void InsertNode(string group, string node, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertNode(Root, group, node, value, EolString(Eol));
+            InsertNode(Root, group, node, value, Eol.ToEolString());
         }
         public void InsertNode(XElement root, string group, string node, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertNode(root, group, node, value, EolString(Eol));
+            InsertNode(root, group, node, value, Eol.ToEolString());
         }
         public void InsertNode(XElement root, string group, string node, string value, string eol)
         {
@@ -170,12 +182,19 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace(root, $"<{group}>", elements.ToArray(), eol);
+            var space = GetIndentSpace(root, $"<{group}>", elements.ToArray(), eol);
 
             // insert node
             root.Element(ns + group).Add(space, new XElement(ns + node, value), eol, space);
         }
 
+        /// <summary>
+        /// Replace node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
         public void ReplaceNode(string group, string node, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -202,15 +221,21 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Remove node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="leaveBrankLine"></param>
         public void RemoveNode(string group, string node, bool leaveBrankLine = false)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            RemoveNode(Root, group, node, EolString(Eol), leaveBrankLine);
+            RemoveNode(Root, group, node, Eol.ToEolString(), leaveBrankLine);
         }
         public void RemoveNode(XElement root, string group, string node, bool leaveBrankLine = false)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            RemoveNode(root, group, node, EolString(Eol), leaveBrankLine);
+            RemoveNode(root, group, node, Eol.ToEolString(), leaveBrankLine);
         }
         public void RemoveNode(XElement root, string group, string node, string eol, bool leaveBrankLine)
         {
@@ -233,7 +258,7 @@ namespace CsProjEditor
                     var nsString = GetNameSpace(root, ns);
                     elements = elements.Select(x => x.Replace(nsString, ""));
                 }
-                var space = GetIntentSpace(root, $"<{group}>", elements.ToArray(), eol);
+                var space = GetIndentSpace(root, $"<{group}>", elements.ToArray(), eol);
 
                 // remove node and do not leave brank line.
                 // ReplaceAll Element to be nothing + Add removed elements
@@ -253,6 +278,13 @@ namespace CsProjEditor
 
         #region node value operation
 
+        /// <summary>
+        /// Check node's value is desired or not
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool ExistsNodeValue(string group, string node, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -265,6 +297,14 @@ namespace CsProjEditor
             return elementsBase.Any();
         }
 
+        /// <summary>
+        /// Replace node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
         public void ReplaceValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             ReplaceValue(Root, group, node, value, value, replacement, option);
@@ -288,6 +328,11 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Remove node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
         public void RemoveValue(string group, string node)
         {
             RemoveValue(Root, group, node);
@@ -303,6 +348,12 @@ namespace CsProjEditor
             root.Element(ns + group).Element(ns + node).ReplaceAll();
         }
 
+        /// <summary>
+        /// Append node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
         public void AppendValue(string group, string node, string value)
         {
             AppendValue(Root, group, node, value);
@@ -320,6 +371,12 @@ namespace CsProjEditor
                 item.Value += value;
             }
         }
+        /// <summary>
+        /// Pretend node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
         public void PrependValue(string group, string node, string value)
         {
             PrependValue(Root, group, node, value);
@@ -337,6 +394,12 @@ namespace CsProjEditor
                 item.Value = value + item.Value;
             }
         }
+        /// <summary>
+        /// Set node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
         public void SetValue(string group, string node, string value)
         {
             SetValue(Root, group, node, value);
@@ -359,6 +422,14 @@ namespace CsProjEditor
 
         #region attirbute operation
 
+        /// <summary>
+        /// Check attirbute is exists or not
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool ExistsAttribute(string group, string node, string attribute, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -372,15 +443,23 @@ namespace CsProjEditor
             return element.Any();
         }
 
+        /// <summary>
+        /// Insert attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <param name="filterElement"></param>
         public void InsertAttribute(string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(Root, group, node, attribute, value, EolString(Eol), filterElement);
+            InsertAttribute(Root, group, node, attribute, value, Eol.ToEolString(), filterElement);
         }
         public void InsertAttribute(XElement root, string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            InsertAttribute(root, group, node, attribute, value, EolString(Eol), filterElement);
+            InsertAttribute(root, group, node, attribute, value, Eol.ToEolString(), filterElement);
         }
         public void InsertAttribute(XElement root, string group, string node, string attribute, string value, string eol, Func<XElement, bool> filterElement)
         {
@@ -396,12 +475,19 @@ namespace CsProjEditor
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));
             }
-            var space = GetIntentSpace(root, $"<{group}>", elements.ToArray(), eol);
+            var space = GetIndentSpace(root, $"<{group}>", elements.ToArray(), eol);
 
             // insert attribute
             root.Element(ns + group).Add(space, new XElement(ns + node, new XAttribute(attribute, value)), eol, space);
         }
 
+        /// <summary>
+        /// Remove attirbute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
         public void RemoveAttribute(string group, string node, string attribute, string value)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -421,6 +507,15 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Replace attirbute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
         public void ReplaceAttribute(string group, string node, string attribute, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
@@ -443,104 +538,6 @@ namespace CsProjEditor
             {
                 var replaced = Regex.Replace(item.FirstAttribute.Value, pattern, replacement);
                 item.SetAttributeValue(attribute, replaced);
-            }
-        }
-
-        #endregion
-
-        #region utils
-        private XDeclaration GetDeclaration(string path)
-        {
-            var doc = XDocument.Load(path, LoadOptions.PreserveWhitespace);
-            return doc.Declaration;
-        }
-
-        private string GetNameSpace(XElement root, XNamespace ns)
-        {
-            var namespaceString = root.LastAttribute.ToString();
-            var nsString = namespaceString.Contains(ns.ToString())
-                ? $" {namespaceString}"
-                : $" {root.LastAttribute.Name}=\"{ns}\"";
-            return nsString;
-        }
-
-        private string GetIntentSpace(XElement root, string element, string[] insideElement, string eol)
-        {
-            var entries = root.ToString().Split(new[] { eol }, StringSplitOptions.RemoveEmptyEntries);
-            var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
-            var insideElementSpace = insideElement != null && insideElement.Any()
-                ? GetBase(entries, insideElement, eol)
-                : 0;
-            var diff = insideElementSpace - elementSpace;
-            var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
-            return space;
-        }
-
-        private int GetBase(string[] entries, string[] insideElement, string eol)
-        {
-            var matchElements = insideElement.Where(x => !x.Contains(eol)).ToArray();
-            if (matchElements.Any())
-            {
-                var result = matchElements.SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min();
-                return result;
-            }
-            else
-            {
-                return baseSpaceNum;
-            }
-        }
-
-        private string GetIntentSpace(string path, string element, string[] insideElement, string eol)
-        {
-            var entries = File.ReadAllLines(path);
-            var elementSpace = entries.Where(x => x.Contains(element)).Select(x => x?.IndexOf("<")).FirstOrDefault() ?? baseSpaceNum;
-            var insideElementSpace = insideElement != null && insideElement.Any()
-                ? insideElement.Where(x => !x.Contains(eol)).SelectMany(y => entries.Where(x => x.Contains(y)).Select(x => x?.IndexOf(y.First()) ?? baseSpaceNum)).Min()
-                : 0;
-            var diff = insideElementSpace - elementSpace;
-            var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
-            return space;
-        }
-
-        #endregion
-
-        #region linq operation
-
-        public struct NodeFilter
-        {
-            public readonly string GroupName;
-            public readonly string NodeName;
-            public readonly string NodeValue;
-            public readonly IEnumerable<string> AttributeNames;
-            public readonly IEnumerable<string> AttributeValues;
-
-            public NodeFilter(string groupName, string nodeName, string nodeValue, IEnumerable<string> attributeNames, IEnumerable<string> attributeValues)
-                => (GroupName, NodeName, NodeValue, AttributeNames, AttributeValues) = (groupName, nodeName, nodeValue, attributeNames, attributeValues);
-        }
-
-        public IEnumerable<XElement> Filter(Func<NodeFilter, bool> predicate)
-        {
-            return Filter(Root, predicate);
-        }
-        public IEnumerable<XElement> Filter(XElement root, Func<NodeFilter, bool> predicate)
-        {
-            if (root == null) throw new ArgumentNullException(nameof(root));
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            foreach (var group in root.Elements())
-            {
-                foreach (var node in group.Elements())
-                {
-                    var arg = new NodeFilter(
-                        group.Name.LocalName,
-                        node.Name.LocalName,
-                        node.Value,
-                        node?.Attributes().Select(x => x?.Name?.LocalName),
-                        node?.Attributes().Select(x => x?.Value)
-                    );
-                    if (!predicate(arg)) continue;
-                    yield return node;
-                }
             }
         }
 

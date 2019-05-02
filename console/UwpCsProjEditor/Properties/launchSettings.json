@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UwpCsProjEditor": {
+      "commandName": "Project",
+      "commandLineArgs": "store-publish -path C:\\Users\\admin\\Downloads\\uwp\\test.csproj -pfx hogemoge.pfx -thumbnail 1234567890ABCDEF -output C:\\Users\\admin\\Downloads\\uwp\\result.csproj -allowoverwrite true"
+    }
+  }
+}

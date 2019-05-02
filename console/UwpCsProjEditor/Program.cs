@@ -12,17 +12,16 @@ namespace CsProjEditor.UwpCsProjEdior
     class Program
     {
         static async Task Main(string[] args)
-        {
-            await new HostBuilder().RunBatchEngineAsync<UwpCsProjEdior>(args);
-        }
+            => await BatchHost.CreateDefaultBuilder()
+                .RunBatchEngineAsync<CsProjEdior>(args);
     }
 
-    public class UwpCsProjEdior : BatchBase
+    public class CsProjEdior : BatchBase
     {
-        [Command("run")]
+        [Command("store-publish", "modify csproj as uwp store publish modify.")]
         public void Run(string path, string pfx, string thumbnail, string output, bool allowoverwrite = false)
         {
-            this.Context.Logger.LogInformation($"command: 'run'. Parameters are as follows.");
+            this.Context.Logger.LogInformation($"command: 'uwp-store-publish'. Parameters are as follows.");
             this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
             this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
             this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");
@@ -39,16 +38,16 @@ namespace CsProjEditor.UwpCsProjEdior
             this.Context.Logger.LogInformation($"saving generated csproj to {output}");
             if (File.Exists(output) && !allowoverwrite)
             {
-                throw new IOException($"Output path {output} already exists. Please use allowoverwrite to overwrite.");
+                throw new IOException($"Output path {output} already exists. Please use `-allowoverwrite true`.");
             }
             csproj.Save(output);
             this.Context.Logger.LogInformation($"complete! new csproj generated at {output}");
         }
 
-        [Command("dryrun")]
+        [Command("dryrun-store-publish", "dryrun: modify csproj as uwp store publish modify.")]
         public void DryRun(string path, string pfx, string thumbnail)
         {
-            this.Context.Logger.LogInformation($"command: 'dryrun'. Parameters are as follows.");
+            this.Context.Logger.LogInformation($"command: 'dry-uwp-store-publish'. Parameters are as follows.");
             this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
             this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
             this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");

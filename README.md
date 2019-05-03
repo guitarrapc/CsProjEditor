@@ -7,6 +7,29 @@ Currently in development.
 
 Load csproj file and create virtual dom, operate with it and write it out.
 
+## How to use
+
+```chsarp
+// load csproj
+var csproj = CsprojEditor.Load("your.csproj");
+
+// edit
+csproj.SetNodeValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
+csproj.InsertNode("PropertyGroup", "PackageCertificateThumbprint", thumbprint);
+csproj.InsertNode("PropertyGroup", "GenerateAppInstallerFile", "False");
+csproj.InsertNode("PropertyGroup", "AppxAutoIncrementPackageRevision", "True");
+csproj.InsertNode("PropertyGroup", "AppxSymbolPackageEnabled", "False");
+csproj.InsertNode("PropertyGroup", "AppxBundle", "Always");
+csproj.InsertNode("PropertyGroup", "AppxBundlePlatforms", "x86");
+csproj.InsertNode("PropertyGroup", "AppInstallerUpdateFrequency", "1");
+csproj.InsertNode("PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
+csproj.InsertAttribute("ItemGroup", "None", "Include", pfx, e => !e.HasAttributes);
+csproj.InsertAttribute("ItemGroup", "None", "Include", "Package.StoreAssociation.xml", e => !e.HasAttributes);
+
+// save
+csproj.Save(path);
+```
+
 ## Limitation
 
 * Accept utf8 and utf8bom encodings only.
@@ -14,15 +37,15 @@ Load csproj file and create virtual dom, operate with it and write it out.
 
 ## Implementations
 
-* [x] File: Load (csproj load entrypoint)
+* [x] File: Load
 * [x] File: ToString override.
 * [x] File: Detect UTF8 Bom.
 * [x] File: Detect EOL.
 * [x] File: Save with original utf8 encoding, keep BOM.
 * [x] File: Save will add empty line if last line is value.
-* [x] Utils: Get NameSpace (for old csproj, equivalent for new csproj)
-* [x] Utils: Get Declaration (for old csproj, equivalent for new csproj)
-* [x] Utils: Get space for each node
+* [x] XmlUtils: Get NameSpace (for old csproj, equivalent for new csproj)
+* [x] XmlUtils: Get Declaration (for old csproj, equivalent for new csproj)
+* [x] XmlUtils: Get space for each node
 * [x] Filter: filter node, nodevalue and attribute and pass as XElement
 * [x] Node: Get
 * [x] Node: Exists

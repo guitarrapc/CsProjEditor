@@ -345,6 +345,25 @@ namespace CsProjEditor
         #region node value operation
 
         /// <summary>
+        /// Get node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNodeValue(string group, string node)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNodeValue(Root, group, node);
+        }
+        public string[] GetNodeValue(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group).Elements(ns + node);
+            return elementsBase.Select(x => x.Value).ToArray();
+        }
+
+        /// <summary>
         /// Check node's value is desired or not
         /// </summary>
         /// <param name="group"></param>
@@ -415,6 +434,30 @@ namespace CsProjEditor
         }
 
         /// <summary>
+        /// Set node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void SetNodeValue(string group, string node, string value)
+        {
+            SetNodeValue(Root, group, node, value);
+        }
+        public void SetNodeValue(XElement root, string group, string node, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementBase.Any()) return;
+
+            // set value
+            foreach (var item in elementBase)
+            {
+                item.Value = value;
+            }
+        }
+
+        /// <summary>
         /// Append node's value
         /// </summary>
         /// <param name="group"></param>
@@ -458,29 +501,6 @@ namespace CsProjEditor
             foreach (var item in elementBase)
             {
                 item.Value = value + item.Value;
-            }
-        }
-        /// <summary>
-        /// Set node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="value"></param>
-        public void SetNodeValue(string group, string node, string value)
-        {
-            SetNodeValue(Root, group, node, value);
-        }
-        public void SetNodeValue(XElement root, string group, string node, string value)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementBase.Any()) return;
-
-            // set value
-            foreach (var item in elementBase)
-            {
-                item.Value = value;
             }
         }
 

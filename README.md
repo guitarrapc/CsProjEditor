@@ -7,57 +7,50 @@ Currently in development.
 
 Load csproj file and create virtual dom, operate with it and write it out.
 
-## TODO
+## Limitation
 
-Implementation
+* Accept utf8 and utf8bom encodings only.
+* Accept file path or stream only. (no parsing string.)
 
-* [x] Detect: EOL
-* [x] Detect: UTF8 BOM
-* [x] Detect: Space for each node
-* [x] Detect: NameSpace (for old csproj, equivalent for new csproj)
-* [x] Detect: Declaration (for old csproj, equivalent for new csproj)
+## Implementations
+
+* [x] File: Load (csproj load entrypoint)
+* [x] File: ToString override.
+* [x] File: Detect UTF8 Bom.
+* [x] File: Detect EOL.
+* [x] File: Save with original utf8 encoding, keep BOM.
+* [x] File: Save will add empty line if last line is value.
+* [x] Utils: Get NameSpace (for old csproj, equivalent for new csproj)
+* [x] Utils: Get Declaration (for old csproj, equivalent for new csproj)
+* [x] Utils: Get space for each node
 * [x] Filter: filter node, nodevalue and attribute and pass as XElement
+* [x] Node: Get
 * [x] Node: Exists
 * [x] Node: Insert
-* [x] Node: Replace
 * [x] Node: Remove
+* [x] Node: Replace
+* [x] NodeValue: Get
 * [x] NodeValue: Exists
 * [x] NodeValue: Set
+* [x] NodeValue: Append
 * [x] NodeValue: Prepend
-* [x] NodeValue: Apend
-* [x] NodeValue: Replace
 * [x] NodeValue: Remove
+* [x] NodeValue: Replace
+* [x] Attribute: Get
 * [x] Attribute: Exists
 * [x] Attribute: Insert
+* [x] Attribute: Set
 * [x] Attribute: Remove
 * [x] Attribute: Replace
-* [x] Load: load csproj as XPath
-* [x] Write: write with original utf8 encoding, keep BOM.
-* [x] Write: add empty line if last line is value.
-
-Test for following
-
-* [ ] eolstring test
-* [ ] output test
-* [ ] GetUtf8String test
-* [ ] GetFileEncoding test
-* [ ] declaration test - old csproj (contains) / new csproj (missing)
-* [ ] Save test
-* [ ] Replace test
-* [ ] Insert test
-* [ ] InsertAttribute test
-* [ ] GetIntentSpace test
-
-Test: Prepare mock data - old csproj
-
-* [ ] utf8 crlf (unity gen)
-* [ ] utf8 lf
-* [ ] utf8bom crlf
-* [ ] utf8bom lf
-
-Test: Prepare mock data - new csproj
-
-* [ ] utf8 crlf
-* [ ] utf8 lf
-* [ ] utf8bom crlf
-* [ ] utf8bom lf
+* [x] AttributeValue: Get
+* [x] AttributeValue: Exists
+* [x] AttributeValue: Set
+* [x] AttributeValue: Append
+* [x] AttributeValue: Prepend
+* [x] AttributeValue: Remove
+* [x] AttributeValue: Replace
+* [x] Tests: Node
+* [x] Tests: NodeValue
+* [x] Tests: Attribute
+* [x] Tests: AttributeValue
+* [x] Tests: Save

@@ -274,39 +274,6 @@ namespace CsProjEditor
         }
 
         /// <summary>
-        /// Replace node
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="replacement"></param>
-        /// <param name="option"></param>
-        public void ReplaceNode(string group, string node, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            ReplaceNode(Root, group, node, node, replacement, option);
-        }
-        public void ReplaceNode(string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            ReplaceNode(Root, group, node, pattern, replacement, option);
-        }
-        public void ReplaceNode(XElement root, string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementsBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementsBase.Any()) return;
-
-            // replace node.
-            var origin = root.Element(ns + group).Element(ns + node);
-            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
-            if (origin.Name.LocalName != replaced)
-            {
-                origin.Name = ns + replaced;
-            }
-        }
-
-        /// <summary>
         /// Remove node
         /// </summary>
         /// <param name="group"></param>
@@ -359,6 +326,39 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Replace node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
+        public void ReplaceNode(string group, string node, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, group, node, node, replacement, option);
+        }
+        public void ReplaceNode(string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, group, node, pattern, replacement, option);
+        }
+        public void ReplaceNode(XElement root, string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementsBase.Any()) return;
+
+            // replace node.
+            var origin = root.Element(ns + group).Element(ns + node);
+            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
+            if (origin.Name.LocalName != replaced)
+            {
+                origin.Name = ns + replaced;
+            }
+        }
+
         #endregion
 
         #region node value operation
@@ -399,57 +399,6 @@ namespace CsProjEditor
             var ns = root.Name.Namespace;
             var elementsBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value);
             return elementsBase.Any();
-        }
-
-        /// <summary>
-        /// Replace node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="value"></param>
-        /// <param name="replacement"></param>
-        /// <param name="option"></param>
-        public void ReplaceNodeValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            ReplaceNodeValue(Root, group, node, value, value, replacement, option);
-        }
-        public void ReplaceNodeValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            ReplaceNodeValue(Root, group, node, value, pattern, replacement, option);
-        }
-        public void ReplaceNodeValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value);
-            if (!elementBase.Any()) return;
-
-            // replace value
-            foreach (var item in elementBase)
-            {
-                var replaced = Regex.Replace(item.Value, pattern, replacement, option);
-                item.Value = replaced;
-            }
-        }
-
-        /// <summary>
-        /// Remove node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        public void RemoveNodeValue(string group, string node)
-        {
-            RemoveNodeValue(Root, group, node);
-        }
-        public void RemoveNodeValue(XElement root, string group, string node)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node);
-            if (!elementBase.Any()) return;
-
-            // remove value
-            root.Element(ns + group).Element(ns + node).ReplaceAll();
         }
 
         /// <summary>
@@ -520,6 +469,57 @@ namespace CsProjEditor
             foreach (var item in elementBase)
             {
                 item.Value = value + item.Value;
+            }
+        }
+
+        /// <summary>
+        /// Remove node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        public void RemoveNodeValue(string group, string node)
+        {
+            RemoveNodeValue(Root, group, node);
+        }
+        public void RemoveNodeValue(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node);
+            if (!elementBase.Any()) return;
+
+            // remove value
+            root.Element(ns + group).Element(ns + node).ReplaceAll();
+        }
+
+        /// <summary>
+        /// Replace node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
+        public void ReplaceNodeValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            ReplaceNodeValue(Root, group, node, value, value, replacement, option);
+        }
+        public void ReplaceNodeValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            ReplaceNodeValue(Root, group, node, value, pattern, replacement, option);
+        }
+        public void ReplaceNodeValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value);
+            if (!elementBase.Any()) return;
+
+            // replace value
+            foreach (var item in elementBase)
+            {
+                var replaced = Regex.Replace(item.Value, pattern, replacement, option);
+                item.Value = replaced;
             }
         }
 

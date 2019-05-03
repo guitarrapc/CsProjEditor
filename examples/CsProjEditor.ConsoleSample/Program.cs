@@ -22,7 +22,7 @@ namespace CsProjEditor.ConsoleSample
             var csproj = CsProjEditor.Load(path);
 
             // edit
-            csproj.SetValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
+            csproj.SetNodeValue("PropertyGroup", "PackageCertificateKeyFile", pfx);
             csproj.InsertNode("PropertyGroup", "PackageCertificateThumbprint", thumbprint);
             csproj.InsertNode("PropertyGroup", "GenerateAppInstallerFile", "False");
             csproj.InsertNode("PropertyGroup", "AppxAutoIncrementPackageRevision", "True");

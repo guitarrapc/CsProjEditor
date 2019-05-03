@@ -38,25 +38,43 @@ namespace CsProjEditor
         }
 
         /// <summary>
-        /// Load csproj from path
+        /// Load csproj from stream
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="stream"></param>
         /// <param name="options"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
         public static CsProjEditor Load(Stream stream, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
-            string xml = "";
-            using (var reader = new StreamReader(stream))
+            StreamReader streamReader = null;
+            BinaryReader binaryReader = null;
+            try
             {
-                xml = reader.ReadToEnd();
+                string xml = "";
+                // no `using statement` to re-use stream
+                // manual read stream to get string
+                streamReader = new StreamReader(stream);
+                xml = streamReader.ReadToEnd();
                 if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+
+                // manual read stream as binary to get bom
+                byte[] bytes = new byte[3];
+                binaryReader = new BinaryReader(stream);
+                binaryReader.Read(bytes, 0, 3);
+                if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+
+                var editor = new CsProjEditor("", xml);
+                editor.Root = XElement.Parse(xml, options);
+                editor.Encoding = GetUtf8Encoding(bytes);
+                editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
+                editor.Initialized = true;
+                return editor;
             }
-            var editor = new CsProjEditor("", xml);
-            editor.Root = XElement.Parse(xml, options);
-            editor.Encoding = CsProjEditor.GetUtf8EncodingFromXml(xml);
-            editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
-            editor.Initialized = true;
-            return editor;
+            finally
+            {
+                streamReader?.Close();
+                binaryReader?.Close();
+            }
         }
 
         public override string ToString()
@@ -100,25 +118,16 @@ namespace CsProjEditor
         /// <returns></returns>
         public static Encoding GetUtf8Encoding(string path)
         {
-            using (var reader = new FileStream(path, FileMode.Open))
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                var bits = new byte[3];
-                reader.Read(bits, 0, 3);
-                var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
-                return new System.Text.UTF8Encoding(isBom);
+                var bytes = new byte[3];
+                reader.Read(bytes, 0, 3);
+                return GetUtf8Encoding(bytes);
             }
         }
-        public static Encoding GetUtf8Encoding(Stream stream)
+        public static Encoding GetUtf8Encoding(byte[] bytes)
         {
-            var bits = new byte[3];
-            stream.Read(bits, 0, 3);
-            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
-            return new System.Text.UTF8Encoding(isBom);
-        }
-        public static Encoding GetUtf8EncodingFromXml(string xml)
-        {
-            var bits = xml.Take(3).Select(x => Convert.ToByte(x)).ToArray();
-            var isBom = bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF;
+            var isBom = bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
             return new System.Text.UTF8Encoding(isBom);
         }
 
@@ -133,7 +142,7 @@ namespace CsProjEditor
         /// <returns></returns>
         public static EolType GetEndOfLine(string path)
         {
-            using (var reader = new FileStream(path, FileMode.Open))
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 var bits = new byte[1024];
                 reader.Read(bits, 0, 1024);
@@ -192,6 +201,25 @@ namespace CsProjEditor
         #region node operation
 
         /// <summary>
+        /// Get node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNode(string group, string node)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNode(Root, group, node);
+        }
+        public string[] GetNode(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group).Elements(ns + node);
+            return elementsBase.Select(x => x.Name.LocalName).ToArray();
+        }
+
+        /// <summary>
         /// Check node is exists or not
         /// </summary>
         /// <param name="group"></param>
@@ -243,39 +271,6 @@ namespace CsProjEditor
 
             // insert node
             root.Element(ns + group).Add(space, new XElement(ns + node, value), eol, space);
-        }
-
-        /// <summary>
-        /// Replace node
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="replacement"></param>
-        /// <param name="option"></param>
-        public void ReplaceNode(string group, string node, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            ReplaceNode(Root, group, node, node, replacement, option);
-        }
-        public void ReplaceNode(string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            ReplaceNode(Root, group, node, pattern, replacement, option);
-        }
-        public void ReplaceNode(XElement root, string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementsBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementsBase.Any()) return;
-
-            // replace node.
-            var origin = root.Element(ns + group).Element(ns + node);
-            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
-            if (origin.Name.LocalName != replaced)
-            {
-                origin.Name = ns + replaced;
-            }
         }
 
         /// <summary>
@@ -331,9 +326,61 @@ namespace CsProjEditor
             }
         }
 
+        /// <summary>
+        /// Replace node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
+        public void ReplaceNode(string group, string node, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, group, node, node, replacement, option);
+        }
+        public void ReplaceNode(string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceNode(Root, group, node, pattern, replacement, option);
+        }
+        public void ReplaceNode(XElement root, string group, string node, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementsBase.Any()) return;
+
+            // replace node.
+            var origin = root.Element(ns + group).Element(ns + node);
+            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
+            if (origin.Name.LocalName != replaced)
+            {
+                origin.Name = ns + replaced;
+            }
+        }
+
         #endregion
 
         #region node value operation
+
+        /// <summary>
+        /// Get node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNodeValue(string group, string node)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNodeValue(Root, group, node);
+        }
+        public string[] GetNodeValue(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group).Elements(ns + node);
+            return elementsBase.Select(x => x.Value).ToArray();
+        }
 
         /// <summary>
         /// Check node's value is desired or not
@@ -355,6 +402,97 @@ namespace CsProjEditor
         }
 
         /// <summary>
+        /// Set node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void SetNodeValue(string group, string node, string value)
+        {
+            SetNodeValue(Root, group, node, value);
+        }
+        public void SetNodeValue(XElement root, string group, string node, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementBase.Any()) return;
+
+            // set value
+            foreach (var item in elementBase)
+            {
+                item.Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Append node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void AppendNodeValue(string group, string node, string value)
+        {
+            AppendNodeValue(Root, group, node, value);
+        }
+        public void AppendNodeValue(XElement root, string group, string node, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementBase.Any()) return;
+
+            // append value
+            foreach (var item in elementBase)
+            {
+                item.Value += value;
+            }
+        }
+        /// <summary>
+        /// Prepend node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void PrependNodeValue(string group, string node, string value)
+        {
+            PrependNodeValue(Root, group, node, value);
+        }
+        public void PrependNodeValue(XElement root, string group, string node, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            if (!elementBase.Any()) return;
+
+            // prepend value
+            foreach (var item in elementBase)
+            {
+                item.Value = value + item.Value;
+            }
+        }
+
+        /// <summary>
+        /// Remove node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        public void RemoveNodeValue(string group, string node)
+        {
+            RemoveNodeValue(Root, group, node);
+        }
+        public void RemoveNodeValue(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node);
+            if (!elementBase.Any()) return;
+
+            // remove value
+            root.Element(ns + group).Element(ns + node).ReplaceAll();
+        }
+
+        /// <summary>
         /// Replace node's value
         /// </summary>
         /// <param name="group"></param>
@@ -362,15 +500,15 @@ namespace CsProjEditor
         /// <param name="value"></param>
         /// <param name="replacement"></param>
         /// <param name="option"></param>
-        public void ReplaceValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(string group, string node, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, group, node, value, value, replacement, option);
+            ReplaceNodeValue(Root, group, node, value, value, replacement, option);
         }
-        public void ReplaceValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
-            ReplaceValue(Root, group, node, value, pattern, replacement, option);
+            ReplaceNodeValue(Root, group, node, value, pattern, replacement, option);
         }
-        public void ReplaceValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        public void ReplaceNodeValue(XElement root, string group, string node, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             var ns = root.Name.Namespace;
             // validation
@@ -385,99 +523,28 @@ namespace CsProjEditor
             }
         }
 
-        /// <summary>
-        /// Remove node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        public void RemoveValue(string group, string node)
-        {
-            RemoveValue(Root, group, node);
-        }
-        public void RemoveValue(XElement root, string group, string node)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node);
-            if (!elementBase.Any()) return;
-
-            // remove value
-            root.Element(ns + group).Element(ns + node).ReplaceAll();
-        }
-
-        /// <summary>
-        /// Append node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="value"></param>
-        public void AppendValue(string group, string node, string value)
-        {
-            AppendValue(Root, group, node, value);
-        }
-        public void AppendValue(XElement root, string group, string node, string value)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementBase.Any()) return;
-
-            // append value
-            foreach (var item in elementBase)
-            {
-                item.Value += value;
-            }
-        }
-        /// <summary>
-        /// Pretend node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="value"></param>
-        public void PrependValue(string group, string node, string value)
-        {
-            PrependValue(Root, group, node, value);
-        }
-        public void PrependValue(XElement root, string group, string node, string value)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementBase.Any()) return;
-
-            // prepend value
-            foreach (var item in elementBase)
-            {
-                item.Value = value + item.Value;
-            }
-        }
-        /// <summary>
-        /// Set node's value
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="node"></param>
-        /// <param name="value"></param>
-        public void SetValue(string group, string node, string value)
-        {
-            SetValue(Root, group, node, value);
-        }
-        public void SetValue(XElement root, string group, string node, string value)
-        {
-            var ns = root.Name.Namespace;
-            // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (!elementBase.Any()) return;
-
-            // set value
-            foreach (var item in elementBase)
-            {
-                item.Value = value;
-            }
-        }
-
         #endregion
 
         #region attirbute operation
+
+        /// <summary>
+        /// Get attirbute Value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public string[] GetAttribute(string group, string node)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetAttribute(Root, group, node);
+        }
+        public string[] GetAttribute(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node);
+            return element.Select(x => x?.FirstAttribute?.Name?.ToString()).ToArray();
+        }
 
         /// <summary>
         /// Check attirbute is exists or not
@@ -485,18 +552,17 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="attribute"></param>
-        /// <param name="value"></param>
         /// <returns></returns>
-        public bool ExistsAttribute(string group, string node, string attribute, string value)
+        public bool ExistsAttribute(string group, string node, string attribute)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            return ExistsAttribute(Root, group, node, attribute, value);
+            return ExistsAttribute(Root, group, node, attribute);
         }
-        public bool ExistsAttribute(XElement root, string group, string node, string attribute, string value)
+        public bool ExistsAttribute(XElement root, string group, string node, string attribute)
         {
             var ns = root.Name.Namespace;
             // validation
-            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value);
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute);
             return element.Any();
         }
 
@@ -539,6 +605,58 @@ namespace CsProjEditor
         }
 
         /// <summary>
+        /// Set attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <param name="filterElement"></param>
+        public void SetAttribute(string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            SetAttribute(Root, group, node, attribute, value, filterElement);
+        }
+        public void SetAttribute(XElement root, string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name != attribute);
+            if (!element.Any()) return;
+
+            // set attribute
+            foreach (var target in element)
+            {
+                target.SetAttributeValue(attribute, value);
+            }
+        }
+
+        /// <summary>
+        /// Remove attirbute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        public void RemoveAttribute(string group, string node, string attribute)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            RemoveAttribute(Root, group, node, attribute);
+        }
+        public void RemoveAttribute(XElement root, string group, string node, string attribute)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute).ToArray();
+            if (!elements.Any()) return;
+
+            // remove attribute
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Remove();
+            }
+        }
+
+        /// <summary>
         /// Remove attirbute
         /// </summary>
         /// <param name="group"></param>
@@ -570,13 +688,12 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="attribute"></param>
-        /// <param name="value"></param>
         /// <param name="replacement"></param>
         /// <param name="option"></param>
         public void ReplaceAttribute(string group, string node, string attribute, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            ReplaceAttribute(Root, group, node, attribute, value, value, replacement, option);
+            ReplaceAttribute(Root, group, node, attribute, value, attribute, replacement, option);
         }
         public void ReplaceAttribute(string group, string node, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
@@ -584,6 +701,189 @@ namespace CsProjEditor
             ReplaceAttribute(Root, group, node, attribute, value, pattern, replacement, option);
         }
         public void ReplaceAttribute(XElement root, string group, string node, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
+            if (!elements.Any()) return;
+
+            // replace attribute
+            foreach (var item in elements)
+            {
+                var replaced = Regex.Replace(item.FirstAttribute.Name.LocalName, pattern, replacement);
+                item.ReplaceAttributes(new XAttribute(replaced, item.FirstAttribute.Value));
+            }
+        }
+
+        #endregion
+
+        #region attirbute value operation
+
+        /// <summary>
+        /// Get attirbute Value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        public string[] GetAttributeValue(string group, string node, string attribute)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetAttributeValue(Root, group, node, attribute);
+        }
+        public string[] GetAttributeValue(XElement root, string group, string node, string attribute)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute);
+            return element.Select(x => x?.FirstAttribute?.Value).ToArray();
+        }
+
+        /// <summary>
+        /// Check attirbute and value is exists or not
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool ExistsAttributeValue(string group, string node, string attribute, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return ExistsAttributeValue(Root, group, node, attribute, value);
+        }
+        public bool ExistsAttributeValue(XElement root, string group, string node, string attribute, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value);
+            return element.Any();
+        }
+
+        /// <summary>
+        /// Set attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        public void SetAttributeValue(string group, string node, string attribute, string value, string newValue)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            SetAttributeValue(Root, group, node, attribute, value, newValue);
+        }
+        public void SetAttributeValue(XElement root, string group, string node, string attribute, string value, string newValue)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
+            if (!elements.Any()) return;
+
+            // set attribute value
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Value = newValue;
+            }
+        }
+
+        /// <summary>
+        /// Append attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        public void AppendAttributeValue(string group, string node, string attribute, string value, string append)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            AppendAttributeValue(Root, group, node, attribute, value, append);
+        }
+        public void AppendAttributeValue(XElement root, string group, string node, string attribute, string value, string append)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
+            if (!elements.Any()) return;
+
+            // set attribute value
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Value += append;
+            }
+        }
+
+        /// <summary>
+        /// Prepend attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        public void PrependAttributeValue(string group, string node, string attribute, string value, string prepend)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            PrependAttributeValue(Root, group, node, attribute, value, prepend);
+        }
+        public void PrependAttributeValue(XElement root, string group, string node, string attribute, string value, string prepend)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
+            if (!elements.Any()) return;
+
+            // set attribute value
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Value = prepend + item.FirstAttribute.Value;
+            }
+        }
+
+        /// <summary>
+        /// Remove attirbute value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        public void RemoveAttributeValue(string group, string node, string attribute, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            RemoveAttributeValue(Root, group, node, attribute, value);
+        }
+        public void RemoveAttributeValue(XElement root, string group, string node, string attribute, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute && x?.FirstAttribute?.Value == value).ToArray();
+            if (!elements.Any()) return;
+
+            // remove attribute
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Value = "";
+            }
+        }
+
+        /// <summary>
+        /// Replace attirbute value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
+        public void ReplaceAttributeValue(string group, string node, string attribute, string value, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceAttributeValue(Root, group, node, attribute, value, value, replacement, option);
+        }
+        public void ReplaceAttributeValue(string group, string node, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceAttributeValue(Root, group, node, attribute, value, pattern, replacement, option);
+        }
+        public void ReplaceAttributeValue(XElement root, string group, string node, string attribute, string value, string pattern, string replacement, RegexOptions option = RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
         {
             var ns = root.Name.Namespace;
             // validation

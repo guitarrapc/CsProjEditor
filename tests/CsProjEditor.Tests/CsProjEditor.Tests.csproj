@@ -18,7 +18,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="testdata\HololensUnityUwpNetAppUtf8CRLF.csproj" />
+    <None Include="testdata\HololensUnityUwpNetAppUtf8BomCRLF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\HololensUnityUwpNetAppUtf8BomLF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\SimpleOldCsProjUtf8LF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\SimpleOldCsProjUtf8CRLF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\HololensUnityUwpNetAppUtf8LF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\InvalidFormat.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="testdata\HololensUnityUwpNetAppUtf8CRLF.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

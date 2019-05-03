@@ -201,6 +201,25 @@ namespace CsProjEditor
         #region node operation
 
         /// <summary>
+        /// Get node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNode(string group, string node)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNode(Root, group, node);
+        }
+        public string[] GetNode(XElement root, string group, string node)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group).Elements(ns + node);
+            return elementsBase.Select(x => x.Name.LocalName).ToArray();
+        }
+
+        /// <summary>
         /// Check node is exists or not
         /// </summary>
         /// <param name="group"></param>

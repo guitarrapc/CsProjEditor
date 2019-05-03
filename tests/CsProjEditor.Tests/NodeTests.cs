@@ -13,6 +13,28 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void GetTest(string csprojPath)
+        {
+            var csproj = CsProjEditor.Load(csprojPath);
+            csproj.GetNode("PropertyGroup", "ProjectGuid").Should().BeEquivalentTo("ProjectGuid");
+            csproj.GetNode("ItemGroup", "SDKReference").Should().BeEquivalentTo(new[] { "SDKReference", "SDKReference" });
+            csproj.GetNode("Target", "Copy").Should().BeEquivalentTo(new[] { "Copy", "Copy" });
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void GetFailTest(string csprojPath)
+        {
+            var csproj = CsProjEditor.Load(csprojPath);
+            csproj.GetNode("PropertyGroup", "HogemogeNotExists").Should().BeEmpty();
+            csproj.GetNode("ItemGroup", "HogemogeNotExists").Should().BeEmpty();
+            csproj.GetNode("Target", "HogemogeNotExists").Should().BeEmpty();
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);

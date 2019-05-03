@@ -75,6 +75,12 @@ namespace CsProjEditor.Tests
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
             csproj.InsertAttribute("PropertyGroup", "Hogemoge", "Fugafuga", "Value", e => !e.HasAttributes);
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "Fugafuga", "Value").Should().BeTrue();
+
+            csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
+            csproj.InsertAttribute("PropertyGroup", "OutputType", "Fugafuga", "Value", e => !e.HasAttributes);
+            csproj.ExistsAttributeValue("PropertyGroup", "OutputType", "Fugafuga", "Value").Should().BeTrue();
+            // Insert will generate node and attribute
+            csproj.GetNode("PropertyGroup", "OutputType").Should().BeEquivalentTo(new[] { "OutputType", "OutputType" });
         }
 
         [Theory]
@@ -85,6 +91,35 @@ namespace CsProjEditor.Tests
             // none existing group insertion will be throw
             var csproj = CsProjEditor.Load(csprojPath);
             Assert.Throws<System.ArgumentNullException>(() => csproj.InsertAttribute("Hogemoge", "Hogemoge", "Fugafuga", "Value", e => !e.HasAttributes));
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void SetTest(string csprojPath)
+        {
+            var csproj = CsProjEditor.Load(csprojPath);
+            csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
+            csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
+            csproj.SetAttribute("PropertyGroup", "Hogemoge", "Fugafuga", "Value", e => !e.HasAttributes);
+            csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "Fugafuga", "Value").Should().BeTrue();
+
+            csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
+            csproj.SetAttribute("PropertyGroup", "OutputType", "Fugafuga", "Value", e => !e.HasAttributes);
+            csproj.ExistsAttributeValue("PropertyGroup", "OutputType", "Fugafuga", "Value").Should().BeTrue();
+            // Insert will generate node and attribute
+            csproj.GetNode("PropertyGroup", "OutputType").Should().BeEquivalentTo(new[] { "OutputType" });
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        public void SetFailTest(string csprojPath)
+        {
+            // none existing group insertion will be throw
+            var csproj = CsProjEditor.Load(csprojPath);
+            csproj.SetAttribute("Hogemoge", "Hogemoge", "Fugafuga", "Value", e => !e.HasAttributes);
+            csproj.ExistsNode("Hogemoge", "Hogemoge").Should().BeFalse();
         }
 
         [Theory]

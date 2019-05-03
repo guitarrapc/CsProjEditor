@@ -605,6 +605,33 @@ namespace CsProjEditor
         }
 
         /// <summary>
+        /// Set attribute
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        /// <param name="filterElement"></param>
+        public void SetAttribute(string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            SetAttribute(Root, group, node, attribute, value, filterElement);
+        }
+        public void SetAttribute(XElement root, string group, string node, string attribute, string value, Func<XElement, bool> filterElement)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var element = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name != attribute);
+            if (!element.Any()) return;
+
+            // set attribute
+            foreach (var target in element)
+            {
+                target.SetAttributeValue(attribute, value);
+            }
+        }
+
+        /// <summary>
         /// Remove attirbute
         /// </summary>
         /// <param name="group"></param>

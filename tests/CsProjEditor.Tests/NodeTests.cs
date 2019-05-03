@@ -87,6 +87,7 @@ namespace CsProjEditor.Tests
             csproj.ExistsNode("PropertyGroup", "ProjectGuidHoge").Should().BeFalse();
             csproj.ReplaceNode("PropertyGroup", "ProjectGuidHoge", "Guid", "Hogemoge");
             csproj.ExistsNode("PropertyGroup", "ProjectGuidHoge").Should().BeFalse();
+            csproj.ExistsNode("PropertyGroup", "ProjectHogemogeHoge").Should().BeFalse();
 
             csproj.ExistsNode("PropertyGroup", "Out").Should().BeFalse();
             csproj.ReplaceNode("PropertyGroup", "Out", "Hogemoge");

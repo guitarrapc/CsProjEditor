@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <PackAsTool>true</PackAsTool>
     <PackageId>uwpcsprojeditor</PackageId>
+    <Description>.NET CLI tool to add uwp store publish settings to csecified .csproj.</Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@ using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -19,13 +20,15 @@ namespace CsProjEditor.Tests
         public SaveTest()
         {
             // ready temp folder
-            var testData = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "testdata"), "SimpleOldCsProjUtf8*.csproj");
             var tempFolder = Path.Combine(Path.GetTempPath(), nameof(FileTest));
             if (!Directory.Exists(tempFolder))
                 Directory.CreateDirectory(tempFolder);
             this.tempFolder = tempFolder;
 
             // Copy csproj to temp
+            var testData = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "testdata"), "SimpleOldCsProjUtf8*.csproj")
+                : Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "testdata"), "SimpleOldCsProjUtf8_LF.csproj");
             foreach (var item in testData)
             {
                 // Gen temp path
@@ -48,8 +51,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("hogemoge.csproj")]
-        public void SaveShouldbeTest(string path)
+        [InlineData("temp.csproj", "compare.csproj")]
+        public void SaveShouldbeTest(string tempPath, string resultPath)
         {
             foreach (var csprojPath in tempPaths)
             {
@@ -68,7 +71,7 @@ namespace CsProjEditor.Tests
 
                 // save
                 var parent = Directory.GetParent(csprojPath);
-                var savePath = Path.Combine(parent.FullName, path);
+                var savePath = Path.Combine(parent.FullName, tempPath);
                 csproj.Save(savePath);
 
                 // check save and ensure
@@ -82,7 +85,7 @@ namespace CsProjEditor.Tests
                 save.RemoveNode("ItemGroup", "Hogemoge", false);
                 save.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
                 save.ExistsNode("ItemGroup", "Hogemoge").Should().BeFalse();
-                var comparePath = Path.Combine(parent.FullName, "compare.csproj");
+                var comparePath = Path.Combine(parent.FullName, resultPath);
                 save.Save(comparePath);
                 var compare = CsProjEditor.Load(comparePath);
                 // make sure comment line will be removed when Removenode with leaveBlankline = false

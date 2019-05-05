@@ -1,6 +1,6 @@
 {
-    "path": "C:/Users/admin/Downloads/uwp/test.csproj",
-    "output": "C:/Users/admin/Downloads/uwp/result.csproj",
+    "path": "SimpleNewCsProjUtf8_CRLF.csproj",
+    "output": "result_SimpleNewCsProjUtf8_CRLF.csproj",
     "dry": false,
     "allowoverwrite": true,
     "commands": [

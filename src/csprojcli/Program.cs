@@ -6,8 +6,9 @@ using System.IO;
 using System.Threading.Tasks;
 using CsProjEditor;
 using System.Linq;
+using System.Reflection;
 
-namespace dotnetcsproj
+namespace csprojcli
 {
     // make UWP Store associated csproj.
     // MEMO: APP pfx and Package.StoreAssociation.xml should prepare/exists in advanced. (with manual relation on Visual Studio)
@@ -15,12 +16,12 @@ namespace dotnetcsproj
     {
         static async Task Main(string[] args)
             => await BatchHost.CreateDefaultBuilder()
-                .RunBatchEngineAsync(args);
+                .RunBatchEngineAsync<EditCsProj>(args);
     }
 
-    public class ProjectBatchBase : BatchBase
+    public class EditCsProj : BatchBase
     {
-        protected void Save(Project csproj, string path, string output, bool allowoverwrite)
+        private void Save(Project csproj, string path, string output, bool allowoverwrite)
         {
             if (string.IsNullOrEmpty(output)) output = "modify_" + path;
             if (File.Exists(output) && !allowoverwrite)
@@ -28,18 +29,71 @@ namespace dotnetcsproj
             csproj.Save(output);
             this.Context.Logger.LogInformation($"complete! new csproj generated at {output}");
         }
-    }
 
-    [Command("batch")]
-    public class Batch : BatchBase
-    {
-        [Command("loadandrun", "load json definition and run.")]
+        [Command(new[] { "version", "-v", "-version", "--version" }, "show version")]
+        public void Version()
+        {
+            var version = Assembly.GetEntryAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                .InformationalVersion
+                .ToString();
+            Context.Logger.LogInformation($"csprojcli v{version}");
+        }
+
+        [Command(new[] { "help", "list", "-h", "-help", "--help" }, "show help")]
+        public void Help()
+        {
+            Context.Logger.LogInformation("Usage: csprojcli [version] [help] [batch.loadandrun|batch.run|node.get|node.exists|node.insert|node.replace|node.remove|nodevalue.get|nodevalue.exists|nodevalue.set|nodevalue.append|nodevalue.prepend|nodevalue.replace|nodevalue.remove|attribute.get|attribute.exists|attribute.insert|attribute.replace|attribute.remove|attributevalue.get|attributevalue.exists|attributevalue.set|attributevalue.append|attributevalue.prepend|attributevalue.replace|attributevalue.remove] [parameters]");
+            Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for Batch execution. see JSON sample at https://raw.githubusercontent.com/guitarrapc/CsProjEditor/master/src/csprojcli/sample.json ");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli batch.loadandrun -jsonPath examples/csprojcli/uwp_storepublish.json");
+            Context.Logger.LogInformation("$ csprojcli batch.run -json JSON");
+            Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for node execution.:");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli node.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework");
+            Context.Logger.LogInformation("$ csprojcli node.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework");
+            Context.Logger.LogInformation("$ csprojcli node.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli node.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n LangVersion -pattern latest -replacement preview -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli node.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n LangVersion -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for node value execution.:");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework -v netstandard2.0");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.set -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n PackageCertificateKeyFile -v hogehoge.pfx -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.append -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n RootNamespace -v SimpleCsProj -append ect -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.prepend -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n RootNamespace -v SimpleCsProj -prepend Very -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n OutputType -v Exe -pattern Exe -replacement AppContainer -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli nodevalue.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n AssemblyName -v SimpleCsProj -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for attribute execution.:");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None");
+            Context.Logger.LogInformation("$ csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include");
+            Context.Logger.LogInformation("$ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v example.json -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attribute.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -pattern None -replacement Content -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attribute.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Exclude -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for attribute value execution.:");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n Compile -a Include -v App.cs");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.set -p SimpleNewCsProjUtf8_CRLF.csproj -g Target -n Message -a Importance -v low - -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.append -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -append ect -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.prepend -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -prepend Very -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -pattern project -replacement example -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli attributevalue.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+        }
+
+        [Command("batch.loadandrun", "load json definition and run.")]
         public void LoadAndRun(string jsonPath)
         {
             var json = File.ReadAllText(jsonPath);
             Run(json);
         }
-        [Command("run", "run as json definition.")]
+        [Command("batch.run", "run as json definition.")]
         public void Run(string json)
         {
             var scheme = Utf8Json.JsonSerializer.Deserialize<Scheme>(json);
@@ -174,13 +228,9 @@ namespace dotnetcsproj
             csproj.Save(scheme.output);
             this.Context.Logger.LogInformation($"complete! new csproj generated at {scheme.output}");
         }
-    }
 
-    [Command("node")]
-    public class Node : ProjectBatchBase
-    {
-        [Command("get", "get node for the group.")]
-        public void Get(
+        [Command("node.get", "get node for the group.")]
+        public void NodeGet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node)
@@ -193,8 +243,8 @@ namespace dotnetcsproj
                 this.Context.Logger.LogInformation($"{group}: {item}");
             }
         }
-        [Command("exists", "check specified node is exists.")]
-        public void Exists(
+        [Command("node.exists", "check specified node is exists.")]
+        public void NodeExists(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node)
@@ -202,8 +252,8 @@ namespace dotnetcsproj
             var item = Project.Load(path).ExistsNode(group, node);
             this.Context.Logger.LogInformation(item.ToString());
         }
-        [Command("insert", "insert specified node.")]
-        public void Insert(
+        [Command("node.insert", "insert specified node.")]
+        public void NodeInsert(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -221,8 +271,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("relace", "replace specified node.")]
-        public void Replace(
+        [Command("node.replace", "replace specified node.")]
+        public void NodeReplace(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -242,8 +292,8 @@ namespace dotnetcsproj
             Save(csproj, path, output, allowoverwrite);
         }
 
-        [Command("remove", "remove specified node.")]
-        public void Remove(
+        [Command("node.remove", "remove specified node.")]
+        public void NodeRemove(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -261,13 +311,9 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-    }
 
-    [Command("nodevalue")]
-    public class NodeValue : ProjectBatchBase
-    {
-        [Command("get", "get value for the node.")]
-        public void Get(
+        [Command("nodevalue.get", "get value for the node.")]
+        public void NodeValueGet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node)
@@ -280,8 +326,8 @@ namespace dotnetcsproj
                 this.Context.Logger.LogInformation($"{group}.{node}: {item}");
             }
         }
-        [Command("exists", "check specified node's value is exists.")]
-        public void Exists(
+        [Command("nodevalue.exists", "check specified node's value is exists.")]
+        public void NodeValueExists(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -290,8 +336,8 @@ namespace dotnetcsproj
             var item = Project.Load(path).ExistsNodeValue(group, node, value);
             this.Context.Logger.LogInformation(item.ToString());
         }
-        [Command("set", "set specified node value.")]
-        public void Set(
+        [Command("nodevalue.set", "set specified node value.")]
+        public void NodeValueSet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -309,8 +355,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("append", "append specified node value.")]
-        public void Append([Option("p", "path of csproj.")]string path,
+        [Command("nodevalue.append", "append specified node value.")]
+        public void NodeValueAppend([Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
@@ -328,8 +374,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("prepend", "preppend specified node value.")]
-        public void Prepend(
+        [Command("nodevalue.prepend", "preppend specified node value.")]
+        public void NodeValuePrepend(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -348,8 +394,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("replace", "replace specified node value.")]
-        public void Replace(
+        [Command("nodevalue.replace", "replace specified node value.")]
+        public void NodeValueReplace(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -369,8 +415,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("remove", "remove specified node value.")]
-        public void Remove([Option("p", "path of csproj.")]string path,
+        [Command("nodevalue.remove", "remove specified node value.")]
+        public void NodeValueRemove([Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
@@ -387,13 +433,9 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-    }
 
-    [Command("attribute")]
-    public class Attribute : ProjectBatchBase
-    {
-        [Command("get", "get attribute for the group.")]
-        public void Get(
+        [Command("attribute.get", "get attribute for the group.")]
+        public void AttributeGet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node)
@@ -406,8 +448,8 @@ namespace dotnetcsproj
                 this.Context.Logger.LogInformation($"{group}: {item}");
             }
         }
-        [Command("exists", "check specified attribute is exists.")]
-        public void Exists(
+        [Command("attribute.exists", "check specified attribute is exists.")]
+        public void AttributeExists(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -416,8 +458,8 @@ namespace dotnetcsproj
             var item = Project.Load(path).ExistsAttribute(group, node, attribute);
             this.Context.Logger.LogInformation(item.ToString());
         }
-        [Command("insert", "insert specified attribute.")]
-        public void Insert(
+        [Command("attribute.insert", "insert specified attribute.")]
+        public void AttributeInsert(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -436,8 +478,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("relace", "replace specified attribute with node.")]
-        public void Replace(
+        [Command("attribute.replace", "replace specified attribute with node.")]
+        public void AttributeReplace(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -459,8 +501,8 @@ namespace dotnetcsproj
             Save(csproj, path, output, allowoverwrite);
         }
 
-        [Command("remove", "remove specified attribute.")]
-        public void Remove(
+        [Command("attribute.remove", "remove specified attribute.")]
+        public void AttributeRemove(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -478,13 +520,9 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-    }
 
-    [Command("attributevalue")]
-    public class AttributeValue : ProjectBatchBase
-    {
-        [Command("get", "get value for the attribute.")]
-        public void Get(
+        [Command("attributevalue.get", "get value for the attribute.")]
+        public void AttributeValueGet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -498,8 +536,8 @@ namespace dotnetcsproj
                 this.Context.Logger.LogInformation($"{group}.{node}: {item}");
             }
         }
-        [Command("exists", "check specified attribute's value is exists.")]
-        public void Exists(
+        [Command("attributevalue.exists", "check specified attribute's value is exists.")]
+        public void AttributeValueExists(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -509,8 +547,8 @@ namespace dotnetcsproj
             var item = Project.Load(path).ExistsAttributeValue(group, node, attribute, value);
             this.Context.Logger.LogInformation(item.ToString());
         }
-        [Command("set", "set specified attribute value.")]
-        public void Set(
+        [Command("attributevalue.set", "set specified attribute value.")]
+        public void AttributeValueSet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -529,8 +567,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("append", "append specified attribute value.")]
-        public void Append([Option("p", "path of csproj.")]string path,
+        [Command("attributevalue.append", "append specified attribute value.")]
+        public void AttributeValueAppend([Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("a", "attribute of node")]string attribute,
@@ -549,8 +587,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("prepend", "preppend specified attribute value.")]
-        public void Prepend(
+        [Command("attributevalue.prepend", "preppend specified attribute value.")]
+        public void AttributeValuePrepend(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -570,8 +608,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("replace", "replace specified attribute value.")]
-        public void Replace(
+        [Command("attributevalue.replace", "replace specified attribute value.")]
+        public void AttributeValueReplace(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -592,8 +630,8 @@ namespace dotnetcsproj
             }
             Save(csproj, path, output, allowoverwrite);
         }
-        [Command("remove", "remove specified attribute value.")]
-        public void Remove([Option("p", "path of csproj.")]string path,
+        [Command("attributevalue.remove", "remove specified attribute value.")]
+        public void AttributeValueRemove([Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("a", "attribute of node")]string attribute,

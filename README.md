@@ -61,45 +61,18 @@ more examples? check [examples](https://github.com/guitarrapc/CsProjEditor/tree/
 
 ## CLI Usage
 
-You can find list of methods.
+You can find help.
 
 ```
-> csprojcli
-list of methods:
-Batch.LoadAndRun
-Batch.Run
-Node.Get
-Node.Exists
-Node.Insert
-Node.Replace
-Node.Remove
-NodeValue.Get
-NodeValue.Exists
-NodeValue.Set
-NodeValue.Append
-NodeValue.Prepend
-NodeValue.Replace
-NodeValue.Remove
-Attribute.Get
-Attribute.Exists
-Attribute.Insert
-Attribute.Replace
-Attribute.Remove
-AttributeValue.Get
-AttributeValue.Exists
-AttributeValue.Set
-AttributeValue.Append
-AttributeValue.Prepend
-AttributeValue.Replace
-AttributeValue.Remove
+> csprojcli help
 ```
 
 You can run for each operation for `Node.*`, `NodeValue.*`, `Attrribute.*` and `AttributeValue.*`. 
 Each command require `save` to overlap previous command execution result, you can do by passing `-dry false` and `-allowoverwrite true`.
 
 ```
-csprojcli NodeValue.Set -p "C:\temp\test.csproj" -g PropertyGroup -n PackageCertificateKeyFile -v hogehoge.pfx -dry false -output "C:\temp\result.csproj" -allowoverwrite true
-csprojcli Node.Insert -p "C:\temp\result.csproj" -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output "C:\temp\result.csproj" -allowoverwrite true
+csprojcli nodevalue.set -p "C:\temp\test.csproj" -g PropertyGroup -n PackageCertificateKeyFile -v hogehoge.pfx -dry false -output "C:\temp\result.csproj" -allowoverwrite true
+csprojcli node.insert -p "C:\temp\result.csproj" -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output "C:\temp\result.csproj" -allowoverwrite true
 ```
 
 ![](docs/csprojcli_each_sample.png)

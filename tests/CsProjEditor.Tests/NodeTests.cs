@@ -2,6 +2,7 @@ using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -121,6 +122,10 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void RemoveTest(string csprojPath)
         {
+            // CRLF test will only run on windows
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && csprojPath.Contains("CRLF"))
+                return;
+
             var csproj = CsProjEditor.Load(csprojPath);
 
             // Remove with leave blank line test.

@@ -4,8 +4,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using CsProjEditor;
 
-namespace CsProjEditor.UwpCsProjEdior
+namespace UwpCsProjEdior
 {
     // make UWP Store associated csproj.
     // MEMO: APP pfx and Package.StoreAssociation.xml should prepare/exists in advanced. (with manual relation on Visual Studio)
@@ -31,7 +32,7 @@ namespace CsProjEditor.UwpCsProjEdior
 
             // run
             this.Context.Logger.LogInformation($"begin editing csproj.");
-            var csproj = CsProjEditor.Load(path);
+            var csproj = Project.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // save
@@ -54,7 +55,7 @@ namespace CsProjEditor.UwpCsProjEdior
 
             // run
             this.Context.Logger.LogInformation($"begin editing csproj\n");
-            var csproj = CsProjEditor.Load(path);
+            var csproj = CsProjEditor.Project.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // output inmemory xml
@@ -64,7 +65,7 @@ namespace CsProjEditor.UwpCsProjEdior
             this.Context.Logger.LogInformation("========== UNTIL HERE ==========");
         }
 
-        private void Modify(CsProjEditor csproj, string pfx, string thumbnail)
+        private void Modify(CsProjEditor.Project csproj, string pfx, string thumbnail)
         {
             // edit
             csproj.SetNodeValue("PropertyGroup", "PackageCertificateKeyFile", pfx);

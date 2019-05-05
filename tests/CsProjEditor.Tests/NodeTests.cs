@@ -18,7 +18,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.GetNode("PropertyGroup", "ProjectGuid").Should().BeEquivalentTo("ProjectGuid");
             csproj.GetNode("ItemGroup", "None").Should().BeEquivalentTo(new[] { "None", "None" });
             csproj.GetNode("Target", "Copy").Should().BeEquivalentTo(new[] { "Copy", "Copy" });
@@ -31,7 +31,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetFailTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.GetNode("PropertyGroup", "HogemogeNotExists").Should().BeEmpty();
             csproj.GetNode("ItemGroup", "HogemogeNotExists").Should().BeEmpty();
             csproj.GetNode("Target", "HogemogeNotExists").Should().BeEmpty();
@@ -44,7 +44,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsNode("Target", "Copy").Should().BeTrue();
@@ -57,7 +57,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsFailTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "HogemogeNotExists").Should().BeFalse();
             csproj.ExistsNode("ItemGroup", "HogemogeNotExists").Should().BeFalse();
             csproj.ExistsNode("Target", "HogemogeNotExists").Should().BeFalse();
@@ -70,7 +70,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void InsertTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
@@ -85,7 +85,7 @@ namespace CsProjEditor.Tests
         public void InsertFailTest(string csprojPath)
         {
             // none existing group insertion will be throw
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             Assert.Throws<NullReferenceException>(() => csproj.InsertNode("Hogemoge", "Hogemoge", "value"));
         }
 
@@ -96,7 +96,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             // simple replacement
             csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
             csproj.ReplaceNode("PropertyGroup", "OutputType", "Hogemoge");
@@ -116,7 +116,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceFailTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
 
             // not exists node will not do any.
             csproj.ExistsNode("PropertyGroup", "OutputTypeHoge").Should().BeFalse();
@@ -144,7 +144,7 @@ namespace CsProjEditor.Tests
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && csprojPath.Contains("CRLF"))
                 return;
 
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
 
             // Remove with leave blank line test.
             var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
@@ -169,7 +169,7 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveFailTest(string csprojPath)
         {
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
 
             // not exists node will not do any.
             var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;

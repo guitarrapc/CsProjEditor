@@ -9,7 +9,7 @@ using static CsProjEditor.XmlUtils;
 
 namespace CsProjEditor
 {
-    public class CsProjEditor
+    public class Project
     {
         private readonly string _path;
         private readonly string _xml;
@@ -19,7 +19,7 @@ namespace CsProjEditor
         public XElement Root { get; private set; }
         public bool Initialized { get; private set; }
 
-        private CsProjEditor(string path, string xml) => (_path, _xml) = (path, xml);
+        private Project(string path, string xml) => (_path, _xml) = (path, xml);
 
         /// <summary>
         /// Load csproj from path
@@ -27,12 +27,12 @@ namespace CsProjEditor
         /// <param name="path"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static CsProjEditor Load(string path, LoadOptions options = LoadOptions.PreserveWhitespace)
+        public static Project Load(string path, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
-            var editor = new CsProjEditor(path, File.ReadAllText(path));
+            var editor = new Project(path, File.ReadAllText(path));
             editor.Root = XElement.Load(path, options);
-            editor.Encoding = CsProjEditor.GetUtf8Encoding(path);
-            editor.Eol = CsProjEditor.GetEndOfLine(path);
+            editor.Encoding = Project.GetUtf8Encoding(path);
+            editor.Eol = Project.GetEndOfLine(path);
             editor.Initialized = true;
             return editor;
         }
@@ -44,7 +44,7 @@ namespace CsProjEditor
         /// <param name="options"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static CsProjEditor Load(Stream stream, LoadOptions options = LoadOptions.PreserveWhitespace)
+        public static Project Load(Stream stream, LoadOptions options = LoadOptions.PreserveWhitespace)
         {
             StreamReader streamReader = null;
             BinaryReader binaryReader = null;
@@ -63,10 +63,10 @@ namespace CsProjEditor
                 binaryReader.Read(bytes, 0, 3);
                 if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
 
-                var editor = new CsProjEditor("", xml);
+                var editor = new Project("", xml);
                 editor.Root = XElement.Parse(xml, options);
                 editor.Encoding = GetUtf8Encoding(bytes);
-                editor.Eol = CsProjEditor.GetEndOfLineFromXml(xml);
+                editor.Eol = Project.GetEndOfLineFromXml(xml);
                 editor.Initialized = true;
                 return editor;
             }
@@ -402,7 +402,7 @@ namespace CsProjEditor
         }
 
         /// <summary>
-        /// Set node's value
+        /// Set nodes value without specify which node by value match
         /// </summary>
         /// <param name="group"></param>
         /// <param name="node"></param>
@@ -424,6 +424,29 @@ namespace CsProjEditor
                 item.Value = value;
             }
         }
+        /// <summary>
+        /// Set node's value
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void SetNodeValue(string group, string node, string value, string newValue)
+        {
+            SetNodeValue(Root, group, node, value, newValue);
+        }
+        public void SetNodeValue(XElement root, string group, string node, string value, string newValue)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value).ToArray();
+            if (!elementBase.Any()) return;
+
+            // set value
+            foreach (var item in elementBase)
+            {
+                item.Value = newValue;
+            }
+        }
 
         /// <summary>
         /// Append node's value
@@ -431,21 +454,21 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="value"></param>
-        public void AppendNodeValue(string group, string node, string value)
+        public void AppendNodeValue(string group, string node, string value, string append)
         {
-            AppendNodeValue(Root, group, node, value);
+            AppendNodeValue(Root, group, node, value, append);
         }
-        public void AppendNodeValue(XElement root, string group, string node, string value)
+        public void AppendNodeValue(XElement root, string group, string node, string value, string append)
         {
             var ns = root.Name.Namespace;
             // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            var elementBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value).ToArray();
             if (!elementBase.Any()) return;
 
             // append value
             foreach (var item in elementBase)
             {
-                item.Value += value;
+                item.Value += append;
             }
         }
         /// <summary>
@@ -454,21 +477,21 @@ namespace CsProjEditor
         /// <param name="group"></param>
         /// <param name="node"></param>
         /// <param name="value"></param>
-        public void PrependNodeValue(string group, string node, string value)
+        public void PrependNodeValue(string group, string node, string value, string prepend)
         {
-            PrependNodeValue(Root, group, node, value);
+            PrependNodeValue(Root, group, node, value, prepend);
         }
-        public void PrependNodeValue(XElement root, string group, string node, string value)
+        public void PrependNodeValue(XElement root, string group, string node, string value, string prepend)
         {
             var ns = root.Name.Namespace;
             // validation
-            var elementBase = root.Elements(ns + group).Elements(ns + node).ToArray();
+            var elementBase = root.Elements(ns + group).Elements(ns + node).Where(x => x.Value == value).ToArray();
             if (!elementBase.Any()) return;
 
             // prepend value
             foreach (var item in elementBase)
             {
-                item.Value = value + item.Value;
+                item.Value = prepend + item.Value;
             }
         }
 
@@ -760,6 +783,31 @@ namespace CsProjEditor
             return element.Any();
         }
 
+        /// <summary>
+        /// Set attribute's value without specify which attribute by value match
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="attribute"></param>
+        /// <param name="value"></param>
+        public void SetAttributeValue(string group, string node, string attribute, string value)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            SetAttributeValue(Root, group, node, attribute, value);
+        }
+        public void SetAttributeValue(XElement root, string group, string node, string attribute, string value)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elements = root.Elements(ns + group).Elements(ns + node).Where(x => x?.FirstAttribute?.Name == attribute).ToArray();
+            if (!elements.Any()) return;
+
+            // set attribute value
+            foreach (var item in elements)
+            {
+                item.FirstAttribute.Value = value;
+            }
+        }
         /// <summary>
         /// Set attribute
         /// </summary>

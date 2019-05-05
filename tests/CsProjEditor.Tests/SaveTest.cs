@@ -56,7 +56,7 @@ namespace CsProjEditor.Tests
         {
             foreach (var csprojPath in tempPaths)
             {
-                var csproj = CsProjEditor.Load(csprojPath);
+                var csproj = Project.Load(csprojPath);
                 // Node / NodeValue
                 csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
                 csproj.InsertNode("PropertyGroup", "Hogemoge", "fugafuga");
@@ -75,7 +75,7 @@ namespace CsProjEditor.Tests
                 csproj.Save(savePath);
 
                 // check save and ensure
-                var save = CsProjEditor.Load(savePath);
+                var save = Project.Load(savePath);
                 save.ExistsNodeValue("PropertyGroup", "Hogemoge", "fugafuga").Should().BeTrue();
                 save.ExistsNodeValue("ItemGroup", "Hogemoge", "fugafuga").Should().BeTrue();
                 save.ExistsAttributeValue("ItemGroup", "Hogemoge", "Copy", "hogemoge").Should().BeTrue();
@@ -87,9 +87,9 @@ namespace CsProjEditor.Tests
                 save.ExistsNode("ItemGroup", "Hogemoge").Should().BeFalse();
                 var comparePath = Path.Combine(parent.FullName, resultPath);
                 save.Save(comparePath);
-                var compare = CsProjEditor.Load(comparePath);
+                var compare = Project.Load(comparePath);
                 // make sure comment line will be removed when Removenode with leaveBlankline = false
-                CsProjEditor.Load(csprojPath).ToString().Should().BeEquivalentTo(compare.ToString());
+                Project.Load(csprojPath).ToString().Should().BeEquivalentTo(compare.ToString());
             }
         }
     }

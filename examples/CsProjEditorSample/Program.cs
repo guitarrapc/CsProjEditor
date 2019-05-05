@@ -19,7 +19,7 @@ namespace CsProjEditor.ConsoleSample
             var thumbprint = args[2];
 
             // prepare
-            var csproj = CsProjEditor.Load(path);
+            var csproj = Project.Load(path);
 
             // edit
             csproj.SetNodeValue("PropertyGroup", "PackageCertificateKeyFile", pfx);

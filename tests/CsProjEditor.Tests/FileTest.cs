@@ -22,7 +22,7 @@ namespace CsProjEditor.Tests
             await Task.Delay(TimeSpan.FromMilliseconds(100));
 
             // Load Should be success
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.Root.ToString().Should().NotBeNullOrEmpty();
 
             // Encoding
@@ -51,7 +51,7 @@ namespace CsProjEditor.Tests
             // Load Should be success
             using (var stream = File.Open(csprojPath, FileMode.Open, FileAccess.Read))
             {
-                var csproj = CsProjEditor.Load(stream);
+                var csproj = Project.Load(stream);
                 csproj.Root.ToString().Should().NotBeNullOrEmpty();
 
                 // Encoding
@@ -79,7 +79,7 @@ namespace CsProjEditor.Tests
             await Task.Delay(TimeSpan.FromMilliseconds(100));
 
             // Load Should be success
-            var csproj = CsProjEditor.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
             csproj.Root.ToString().Should().NotBeNullOrEmpty();
 
             // Encoding
@@ -108,7 +108,7 @@ namespace CsProjEditor.Tests
             // Load Should be success
             using (var stream = File.Open(csprojPath, FileMode.Open, FileAccess.Read))
             {
-                var csproj = CsProjEditor.Load(stream);
+                var csproj = Project.Load(stream);
                 csproj.Root.ToString().Should().NotBeNullOrEmpty();
 
                 // Encoding
@@ -131,7 +131,7 @@ namespace CsProjEditor.Tests
         public void InvalidXmLFormatFailLoadTest(string csprojPath)
         {
             // Load Should throw
-            Assert.Throws<XmlException>(() => CsProjEditor.Load(csprojPath));
+            Assert.Throws<XmlException>(() => Project.Load(csprojPath));
         }
 
         [Theory]
@@ -139,7 +139,7 @@ namespace CsProjEditor.Tests
         public void CsprojPathNotFoundTest(string csprojPath)
         {
             // Load Should throw
-            Assert.Throws<FileNotFoundException>(() => CsProjEditor.Load(csprojPath));
+            Assert.Throws<FileNotFoundException>(() => Project.Load(csprojPath));
         }
     }
 }

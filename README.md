@@ -1,15 +1,40 @@
-[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor) [![codecov](https://codecov.io/gh/guitarrapc/CsProjEditor/branch/master/graph/badge.svg)](https://codecov.io/gh/guitarrapc/CsProjEditor)
-
 ## CsProjEditor
 
+[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor) [![codecov](https://codecov.io/gh/guitarrapc/CsProjEditor/branch/master/graph/badge.svg)](https://codecov.io/gh/guitarrapc/CsProjEditor) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) 
+
+[![NuGet](https://img.shields.io/nuget/v/CsProjEditor.svg?label=CsProjEditor%20nuget)](https://www.nuget.org/packages/CsProjEditor) [![NuGet](https://img.shields.io/nuget/v/csprojcli.svg?label=csprojcli%20nuget)](https://www.nuget.org/packages/csprojcli)
+
 This library offers csproj element/attribute operation without EnvDTE.
-Currently in development.
 
-## What will do
+Load csproj file and create virtual dom, operate and write it out.
 
-Load csproj file and create virtual dom, operate with it and write it out.
+## Motivation
 
-## How to use
+When I want to edit csproj for dynamically generated csproj or vscproj, like Unity UWP generates, publish-store required me to operate with Visual Studio.
+This tools is for this dynamically operate csproj on CI or automation platform.
+
+## Limitation
+
+* Accept only utf8 and utf8bom encodings.
+* Accept only file path or stream. (no parsing string.)
+
+## Install
+
+[NuGet Library](https://www.nuget.org/packages/CsProjEditor/)
+
+```bash
+dotnet add package CsProjEditor
+```
+
+[CLI (.NET Global Tool)](https://www.nuget.org/packages/csprojcli/)
+
+```bash
+dotnet tool install -g csprojcli
+```
+
+## NuGet Usage
+
+Load your csproj from path or Stream, then operate node and attribute!
 
 ```chsarp
 // load csproj
@@ -32,10 +57,66 @@ csproj.InsertAttribute("ItemGroup", "None", "Include", "Package.StoreAssociation
 csproj.Save(path);
 ```
 
-## Limitation
+more examples? check [examples](https://github.com/guitarrapc/CsProjEditor/tree/master/examples/CsProjEditorSample) and [test](https://github.com/guitarrapc/CsProjEditor/tree/master/tests/CsProjEditor.Tests).
 
-* Accept utf8 and utf8bom encodings only.
-* Accept file path or stream only. (no parsing string.)
+## CLI Usage
+
+You can find list of methods.
+
+```
+> csprojcli
+list of methods:
+Batch.LoadAndRun
+Batch.Run
+Node.Get
+Node.Exists
+Node.Insert
+Node.Replace
+Node.Remove
+NodeValue.Get
+NodeValue.Exists
+NodeValue.Set
+NodeValue.Append
+NodeValue.Prepend
+NodeValue.Replace
+NodeValue.Remove
+Attribute.Get
+Attribute.Exists
+Attribute.Insert
+Attribute.Replace
+Attribute.Remove
+AttributeValue.Get
+AttributeValue.Exists
+AttributeValue.Set
+AttributeValue.Append
+AttributeValue.Prepend
+AttributeValue.Replace
+AttributeValue.Remove
+```
+
+You can run for each operation for `Node.*`, `NodeValue.*`, `Attrribute.*` and `AttributeValue.*`. 
+Each command require `save` to overlap previous command execution result, you can do by passing `-dry false` and `-allowoverwrite true`.
+
+```
+csprojcli NodeValue.Set -p "C:\temp\test.csproj" -g PropertyGroup -n PackageCertificateKeyFile -v hogehoge.pfx -dry false -output "C:\temp\result.csproj" -allowoverwrite true
+csprojcli Node.Insert -p "C:\temp\result.csproj" -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output "C:\temp\result.csproj" -allowoverwrite true
+```
+
+![](docs/csprojcli_each_sample.png)
+
+
+Also, you can define commands in JSON and batch execute it with `Batch.LoadAndRun`.
+This will execute defined commands and save, or show dry-run, when everything goes fine.
+
+```
+csprojcli Batch.LoadAndRun -jsonPath your_commands.json
+```
+
+json should follow to [Scheme](https://github.com/guitarrapc/CsProjEditor/blob/master/src/csprojcli/scheme.json) and here' [all command sample JSON](https://github.com/guitarrapc/CsProjEditor/blob/master/src/csprojcli/sample.json).
+
+![](docs/csprojcli_batch_sample.png)
+
+more examples? check [examples](https://github.com/guitarrapc/CsProjEditor/tree/master/examples/csprojcli).
 
 ## Implementations
 

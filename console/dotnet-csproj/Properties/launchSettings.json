@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "dotnet-csproj": {
+      "commandName": "Project"
+    }
+  }
+}

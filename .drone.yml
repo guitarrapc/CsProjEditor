@@ -19,7 +19,7 @@ steps:
   - dotnet test -c Debug --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Include=[CsProjEditor.*]*
   - curl -s https://codecov.io/bash > codecov
   - chmod +x codecov
-  - ./codecov -f ./tests/CsProjEditor.Tests/coverage.opencover.xml
+  - ./codecov -f ./tests/CsProjEditor.Tests/coverage.opencover.xml -t $$CODECOV_TOKEN
   when:
     event:
     - push

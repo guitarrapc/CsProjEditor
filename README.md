@@ -67,7 +67,47 @@ You can find help.
 > csprojcli help
 ```
 
-You can run for each operation for `Node.*`, `NodeValue.*`, `Attrribute.*` and `AttributeValue.*`. 
+You can run for each operation for `node.*`, `nodevalue.*`, `attrribute.*` and `attributevalue.*`. 
+
+here's all commands and examples, you can reproduce with commands running at `examples/csprojcli`.
+
+```
+Usage: csprojcli [version] [help] [batch.loadandrun|batch.run|node.get|node.exists|node.insert|node.replace|node.remove|nodevalue.get|nodevalue.exists|nodevalue.set|nodevalue.append|nodevalue.prepend|nodevalue.replace|nodevalue.remove|attribute.get|attribute.exists|attribute.insert|attribute.replace|attribute.remove|attributevalue.get|attributevalue.exists|attributevalue.set|attributevalue.append|attributevalue.prepend|attributevalue.replace|attributevalue.remove] [parameters]
+
+E.g., run this for Batch execution. see JSON sample at https://raw.githubusercontent.com/guitarrapc/CsProjEditor/master/src/csprojcli/sample.json
+csprojcli batch.loadandrun -jsonPath examples/csprojcli/uwp_storepublish.json
+csprojcli batch.run -json JSON
+
+E.g., run this for command execution.:
+csprojcli node.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework
+csprojcli node.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework
+csprojcli node.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli node.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n LangVersion -v latest -pattern latest -replacement preview -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli node.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n LangVersion -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+
+csprojcli nodevalue.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework
+csprojcli nodevalue.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework -v netstandard2.0
+csprojcli nodevalue.set -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n PackageCertificateKeyFile -v hogehoge.pfx -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli nodevalue.append -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n RootNamespace -v SimpleCsProj -append ect -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli nodevalue.prepend -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n RootNamespace -v SimpleCsProj -prepend Very -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli nodevalue.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n OutputType -v Exe -pattern Exe -replacement AppContainer -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli nodevalue.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n AssemblyName -v SimpleCsProj -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+
+csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None
+csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include
+csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v example.json -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attribute.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -pattern None -replacement Content -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attribute.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Exclude -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+
+csprojcli attributevalue.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None
+csprojcli attributevalue.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n Compile -a Include -v App.cs
+csprojcli attributevalue.set -p SimpleNewCsProjUtf8_CRLF.csproj -g Target -n Message -a Importance -v Low - -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attributevalue.append -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v hogehoge.json -append ect -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attributevalue.prepend -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -prepend Very -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attributevalue.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -pattern Simple -replacement Complex -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+csprojcli attributevalue.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+```
+
 Each command require `save` to overlap previous command execution result, you can do by passing `-dry false` and `-allowoverwrite true`.
 
 ```
@@ -78,11 +118,11 @@ csprojcli node.insert -p "C:\temp\result.csproj" -g PropertyGroup -n PackageCert
 ![](docs/csprojcli_each_sample.png)
 
 
-Also, you can define commands in JSON and batch execute it with `Batch.LoadAndRun`.
+Also, you can define commands in JSON and batch execute it with `batch.loadandrun`.
 This will execute defined commands and save, or show dry-run, when everything goes fine.
 
 ```
-csprojcli Batch.LoadAndRun -jsonPath your_commands.json
+csprojcli batch.loadandrun -jsonPath your_commands.json
 ```
 
 json should follow to [Scheme](https://github.com/guitarrapc/CsProjEditor/blob/master/src/csprojcli/scheme.json) and here' [all command sample JSON](https://github.com/guitarrapc/CsProjEditor/blob/master/src/csprojcli/sample.json).

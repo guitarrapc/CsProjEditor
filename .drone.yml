@@ -13,13 +13,16 @@ steps:
 
 - name: test
   image: mcr.microsoft.com/dotnet/core/sdk:2.2
+  environment:
+    CODECOV_TOKEN:
+      from_secret: CODECOV_TOKEN
   commands:
   - dotnet restore
   - dotnet tool install -g dotnet-reportgenerator-globaltool
   - dotnet test -c Debug --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Include=[CsProjEditor.*]*
   - curl -s https://codecov.io/bash > codecov
   - chmod +x codecov
-  - ./codecov -f ./tests/CsProjEditor.Tests/coverage.opencover.xml -t $$CODECOV_TOKEN
+  - ./codecov -f ./tests/CsProjEditor.Tests/coverage.opencover.xml -t $CODECOV_TOKEN
   when:
     event:
     - push

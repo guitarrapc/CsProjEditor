@@ -37,9 +37,9 @@ steps:
   - dotnet build -c Release
   - dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Include=[CsProjEditor.*]*
   - dotnet pack ./src/csprojcli/csprojcli.csproj -c Release --no-build -p:Version=${DRONE_TAG}
-  - dotnet nuget push ./src/csprojcli/bin/Release/csprojcli.${DRONE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
+  - dotnet nuget push ./src/csprojcli/bin/Release/csprojcli.${DRONE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k $NUGET_KEY
   - dotnet pack ./src/CsProjEditor/CsProjEditor.csproj -c Release --no-build -p:Version=${DRONE_TAG}
-  - dotnet nuget push ./src/CsProjEditor/bin/Release/CsProjEditor.${DRONE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
+  - dotnet nuget push ./src/CsProjEditor/bin/Release/CsProjEditor.${DRONE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k $NUGET_KEY
   when:
     event:
     - tag

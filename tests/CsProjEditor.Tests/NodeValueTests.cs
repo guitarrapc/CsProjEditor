@@ -14,6 +14,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -24,6 +26,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTFailest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -34,29 +38,34 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", "\n")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", "\n")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", "\n")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", "\n")]
         public void ExistsTest(string csprojPath, string eol)
         {
             var csproj = CsProjEditor.Load(csprojPath);
             csproj.ExistsNodeValue("PropertyGroup", "ProjectGuid", "{721f98d5-49a4-41a0-8bd2-76ef253c61dc}").Should().BeTrue();
-            var val = "<Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>".Replace("<Name>", $"{eol}      ").Replace("</Name>", $"{eol}    ");
-            csproj.ExistsNodeValue("ItemGroup", "SDKReference", val).Should().BeTrue();
+            csproj.ExistsNodeValue("ItemGroup", "None", "").Should().BeTrue();
             csproj.ExistsNodeValue("Target", "Copy", "").Should().BeTrue();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
             csproj.ExistsNodeValue("PropertyGroup", "ProjectGuid", "NOT_EXISTS}").Should().BeFalse();
-            csproj.ExistsNodeValue("ItemGroup", "SDKReference", "NOT_EXISTS").Should().BeFalse();
+            csproj.ExistsNodeValue("ItemGroup", "None", "NOT_EXISTS").Should().BeFalse();
             csproj.ExistsNodeValue("Target", "Copy", "NOT_EXISTS").Should().BeFalse();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void SetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -70,6 +79,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void SetFailTest(string csprojPath)
         {
             // none existing group insertion will not throw and do nothing.
@@ -82,6 +93,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void AppendTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -95,6 +108,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void AppendFailTest(string csprojPath)
         {
             // none existing group insertion will not throw and do nothing.
@@ -107,6 +122,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void PrependTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -120,6 +137,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void PrependFailTest(string csprojPath)
         {
             // none existing group insertion will not throw and do nothing.
@@ -132,14 +151,16 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
             // simple replacement
-            csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
-            csproj.ExistsNodeValue("PropertyGroup", "OutputType", "AppContainerExe").Should().BeTrue();
-            csproj.ReplaceNodeValue("PropertyGroup", "OutputType", "AppContainerExe", "Hogemoge");
-            csproj.ExistsNodeValue("PropertyGroup", "OutputType", "Hogemoge").Should().BeTrue();
+            csproj.ExistsNode("PropertyGroup", "RootNamespace").Should().BeTrue();
+            csproj.ExistsNodeValue("PropertyGroup", "RootNamespace", "SimpleCsProj").Should().BeTrue();
+            csproj.ReplaceNodeValue("PropertyGroup", "RootNamespace", "SimpleCsProj", "Hogemoge");
+            csproj.ExistsNodeValue("PropertyGroup", "RootNamespace", "Hogemoge").Should().BeTrue();
 
             // replacement can specify which letter to replace with via `pattern`.
             // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
@@ -156,6 +177,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -176,21 +199,25 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
 
             // Remove with leave blank line test.
             csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
-            csproj.ExistsNodeValue("PropertyGroup", "OutputType", "AppContainerExe").Should().BeTrue();
-            csproj.RemoveNodeValue("PropertyGroup", "OutputType");
-            csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
-            csproj.ExistsNodeValue("PropertyGroup", "OutputType", "").Should().BeTrue();
+            csproj.ExistsNodeValue("PropertyGroup", "ProjectGuid", "{721f98d5-49a4-41a0-8bd2-76ef253c61dc}").Should().BeTrue();
+            csproj.RemoveNodeValue("PropertyGroup", "ProjectGuid");
+            csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
+            csproj.ExistsNodeValue("PropertyGroup", "ProjectGuid", "").Should().BeTrue();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);

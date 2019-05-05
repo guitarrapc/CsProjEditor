@@ -8,8 +8,8 @@
     <ProjectGuid>{721f98d5-49a4-41a0-8bd2-76ef253c61dc}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HololensUnityUwpNetApp</RootNamespace>
-    <AssemblyName>HololensUnityUwpNetApp</AssemblyName>
+    <RootNamespace>SimpleCsProj</RootNamespace>
+    <AssemblyName>SimpleCsProj</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.17134.0</TargetPlatformVersion>
@@ -41,6 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="project.json" />
+    <None Include="sample.json" />
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>

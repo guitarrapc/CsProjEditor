@@ -13,32 +13,38 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.GetAttribute("ItemGroup", "SDKReference").Should().Contain("Include");
-            csproj.GetAttribute("ItemGroup", "SDKReference").Should().BeEquivalentTo(new[] { "Include", "Include" });
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.GetAttribute("ItemGroup", "None").Should().Contain("Include");
+            csproj.GetAttribute("ItemGroup", "None").Should().BeEquivalentTo(new[] { "Include", "Include" });
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetFailest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
-            csproj.ExistsNode("ItemGroup", "SDKReferenceX").Should().BeFalse();
-            csproj.GetAttribute("ItemGroup", "SDKReferenceX").Should().BeEmpty();
+            csproj.ExistsNode("ItemGroup", "NoneX").Should().BeFalse();
+            csproj.GetAttribute("ItemGroup", "NoneX").Should().BeEmpty();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ExistsAttribute("ItemGroup", "SDKReference", "Include").Should().BeTrue();
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.ExistsAttribute("ItemGroup", "None", "Include").Should().BeTrue();
             csproj.ExistsNode("ItemGroup", "Compile").Should().BeTrue();
             csproj.ExistsAttribute("ItemGroup", "Compile", "Include").Should().BeTrue();
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
@@ -50,12 +56,14 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
             // none existing attribute
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ExistsAttribute("ItemGroup", "SDKReference", "IncludeX").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.ExistsAttribute("ItemGroup", "None", "IncludeX").Should().BeFalse();
             csproj.ExistsNode("ItemGroup", "Compile").Should().BeTrue();
             csproj.ExistsAttribute("ItemGroup", "Compile", "IncludeX").Should().BeFalse();
             // none existing node
@@ -68,6 +76,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void InsertTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -86,6 +96,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void InsertFailTest(string csprojPath)
         {
             // none existing group insertion will be throw
@@ -96,6 +108,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void SetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -114,6 +128,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void SetFailTest(string csprojPath)
         {
             // none existing group insertion will be throw
@@ -125,14 +141,16 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
             // simple replacement
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ExistsAttribute("ItemGroup", "SDKReference", "Include").Should().BeTrue();
-            csproj.ReplaceAttribute("ItemGroup", "SDKReference", "Include", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
-            csproj.ExistsAttribute("ItemGroup", "SDKReference", "Hogemoge").Should().BeTrue();
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.ExistsAttribute("ItemGroup", "None", "Include").Should().BeTrue();
+            csproj.ReplaceAttribute("ItemGroup", "None", "Include", "project.json", "Hogemoge");
+            csproj.ExistsAttribute("ItemGroup", "None", "Hogemoge").Should().BeTrue();
 
             // replacement can specify which letter to replace with via `pattern`.
             // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
@@ -145,46 +163,52 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
 
             // not exists attribute will not do any.
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ReplaceAttribute("ItemGroup", "SDKReference", "IncludeX", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReference", "Include", "Hogemoge").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.ReplaceAttribute("ItemGroup", "None", "IncludeX", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
+            csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "Hogemoge").Should().BeFalse();
 
             // not exists node will not do any
-            csproj.ExistsNode("ItemGroup", "SDKReferenceX").Should().BeFalse();
-            csproj.ReplaceAttribute("ItemGroup", "SDKReferenceX", "Include", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReferenceX", "Include", "Hogemoge").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "NoneX").Should().BeFalse();
+            csproj.ReplaceAttribute("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
+            csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Hogemoge").Should().BeFalse();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
 
-            csproj.ExistsNode("ItemGroup", "SDKReference").Should().BeTrue();
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReference", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeTrue();
-            csproj.RemoveAttribute("ItemGroup", "SDKReference", "Include", "Microsoft.VCLibs, Version=14.0");
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReference", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
+            csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeTrue();
+            csproj.RemoveAttribute("ItemGroup", "None", "Include", "project.json");
+            csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeFalse();
         }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
 
             // not exists node will not do any.
-            csproj.ExistsNode("ItemGroup", "SDKReferenceX").Should().BeFalse();
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReferenceX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
-            csproj.RemoveAttribute("ItemGroup", "SDKReferenceX", "Include", "Microsoft.VCLibs, Version=14.0");
-            csproj.ExistsAttributeValue("ItemGroup", "SDKReferenceX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
+            csproj.ExistsNode("ItemGroup", "NoneX").Should().BeFalse();
+            csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
+            csproj.RemoveAttribute("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0");
+            csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
         }
     }
 }

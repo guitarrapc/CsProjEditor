@@ -7,8 +7,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <PackAsTool>true</PackAsTool>
-    <PackageId>uwpcsprojeditor</PackageId>
-    <Description>.NET CLI tool to add uwp store publish settings to csecified .csproj.</Description>
+    <PackageId>dotnet-csproj</PackageId>
+    <Description>.NET CLI tool to edit csproj.</Description>
   </PropertyGroup>
 
   <ItemGroup>

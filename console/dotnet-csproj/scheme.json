@@ -1,0 +1,143 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "path",
+        "output",
+        "dry",
+        "allowoverwrite",
+        "commands"
+    ],
+    "properties": {
+        "path": {
+            "$id": "#/properties/path",
+            "type": "string",
+            "title": "The Path Schema",
+            "default": "",
+            "examples": [
+                "c:/original/bar.csproj"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "output": {
+            "$id": "#/properties/output",
+            "type": "string",
+            "title": "The Output Schema",
+            "default": "",
+            "examples": [
+                "c:/output/bar.csproj"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "dry": {
+            "$id": "#/properties/dry",
+            "type": "boolean",
+            "title": "The Dry Schema",
+            "default": false,
+            "examples": [
+                false
+            ]
+        },
+        "allowoverwrite": {
+            "$id": "#/properties/allowoverwrite",
+            "type": "boolean",
+            "title": "The Allowoverwrite Schema",
+            "default": false,
+            "examples": [
+                true
+            ]
+        },
+        "commands": {
+            "$id": "#/properties/commands",
+            "type": "array",
+            "title": "The Commands Schema",
+            "items": {
+                "$id": "#/properties/commands/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "order",
+                    "type",
+                    "command",
+                    "parameter"
+                ],
+                "properties": {
+                    "order": {
+                        "$id": "#/properties/commands/items/properties/order",
+                        "type": "integer",
+                        "title": "The Order Schema",
+                        "default": 0,
+                        "examples": [
+                            0
+                        ]
+                    },
+                    "type": {
+                        "$id": "#/properties/commands/items/properties/type",
+                        "type": "string",
+                        "title": "The Type Schema",
+                        "default": "",
+                        "examples": [
+                            "node"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "command": {
+                        "$id": "#/properties/commands/items/properties/command",
+                        "type": "string",
+                        "title": "The Command Schema",
+                        "default": "",
+                        "examples": [
+                            "insert"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "parameter": {
+                        "$id": "#/properties/commands/items/properties/parameter",
+                        "type": "object",
+                        "title": "The Parameter Schema",
+                        "required": [
+                            "group",
+                            "node",
+                            "value"
+                        ],
+                        "properties": {
+                            "group": {
+                                "$id": "#/properties/commands/items/properties/parameter/properties/group",
+                                "type": "string",
+                                "title": "The Group Schema",
+                                "default": "",
+                                "examples": [
+                                    "PropertyGroup"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "node": {
+                                "$id": "#/properties/commands/items/properties/parameter/properties/node",
+                                "type": "string",
+                                "title": "The Node Schema",
+                                "default": "",
+                                "examples": [
+                                    "OutputType"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "value": {
+                                "$id": "#/properties/commands/items/properties/parameter/properties/value",
+                                "type": "string",
+                                "title": "The Value Schema",
+                                "default": "",
+                                "examples": [
+                                    "Exe"
+                                ],
+                                "pattern": "^(.*)$"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

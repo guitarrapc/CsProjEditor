@@ -30,6 +30,152 @@ namespace dotnetcsproj
         }
     }
 
+    [Command("batch")]
+    public class Batch : BatchBase
+    {
+        [Command("loadandrun", "load json definition and run.")]
+        public void LoadAndRun(string jsonPath)
+        {
+            var json = File.ReadAllText(jsonPath);
+            Run(json);
+        }
+        [Command("run", "run as json definition.")]
+        public void Run(string json)
+        {
+            var scheme = Utf8Json.JsonSerializer.Deserialize<Scheme>(json);
+
+            // validate
+            if (string.IsNullOrWhiteSpace(scheme.path)) throw new ArgumentNullException($"{nameof(scheme.path)} is missing. please add `path` to specify input csproj path.");
+            if (string.IsNullOrWhiteSpace(scheme.output)) throw new ArgumentNullException($"{nameof(scheme.output)} is missing. please add `output` to specify output csproj path.");
+            if (scheme.dry) Context.Logger.LogInformation("Detected Dry-run mode.");
+            if (scheme.path == scheme.output && scheme.allowoverwrite) Context.Logger.LogInformation("Detected overwrite csproj.");
+
+            // run
+            var csproj = Project.Load(scheme.path);
+
+            foreach (var command in scheme.commands.OrderBy(x => x.order))
+            {
+                Context.Logger.LogInformation($"#{command.order}: Running {command.type}.{command.command}. group: {command.parameter.group}, node: {command.parameter.node}");
+
+                // validate required parameter
+                if (string.IsNullOrWhiteSpace(command.parameter.group))
+                {
+                    Context.Logger.LogWarning($"#{command.order}: {command.parameter.group} was empty, please specify node. skip and run next.");
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(command.parameter.node))
+                {
+                    Context.Logger.LogWarning($"#{command.order}: {command.parameter.node} was empty, please specify node. skip and run next.");
+                    continue;
+                }
+
+                if (command.type == "node")
+                {
+                    switch (command.command)
+                    {
+                        case "insert":
+                            csproj.InsertNode(command.parameter.group, command.parameter.node, command.parameter.value);
+                            break;
+                        case "replace":
+                            csproj.ReplaceNode(command.parameter.group, command.parameter.node, command.parameter.pattern, command.parameter.replacement);
+                            break;
+                        case "remove":
+                            csproj.RemoveNode(command.parameter.group, command.parameter.node, command.parameter.leaveBrankLine);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else if (command.type == "nodevalue")
+                {
+                    switch (command.command)
+                    {
+                        case "set":
+                            if (string.IsNullOrWhiteSpace(command.parameter.newvalue))
+                            {
+                                csproj.SetNodeValue(command.parameter.group, command.parameter.node, command.parameter.value);
+                            }
+                            else
+                            {
+                                csproj.SetNodeValue(command.parameter.group, command.parameter.node, command.parameter.value, command.parameter.newvalue);
+                            }
+                            break;
+                        case "append":
+                            csproj.AppendNodeValue(command.parameter.group, command.parameter.node, command.parameter.value, command.parameter.newvalue);
+                            break;
+                        case "prepend":
+                            csproj.PrependNodeValue(command.parameter.group, command.parameter.node, command.parameter.value, command.parameter.newvalue);
+                            break;
+                        case "replace":
+                            csproj.ReplaceNodeValue(command.parameter.group, command.parameter.node, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            break;
+                        case "remove":
+                            csproj.RemoveNodeValue(command.parameter.group, command.parameter.node);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else if (command.type == "attribute")
+                {
+                    switch (command.command)
+                    {
+                        case "insert":
+                            csproj.InsertAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, e => !e.HasAttributes);
+                            break;
+                        case "replace":
+                            csproj.ReplaceAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            break;
+                        case "remove":
+                            csproj.RemoveAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else if (command.type == "attributevalue")
+                {
+                    switch (command.command)
+                    {
+                        case "set":
+                            csproj.SetAttributeValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value);
+                            break;
+                        case "append":
+                            csproj.AppendAttributeValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.newvalue);
+                            break;
+                        case "prepend":
+                            csproj.PrependAttributeValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.newvalue);
+                            break;
+                        case "replace":
+                            csproj.ReplaceAttributeValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            break;
+                        case "remove":
+                            csproj.RemoveAttributeValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+            }
+
+            if (scheme.dry)
+            {
+                Context.Logger.LogInformation($"Complete all commands. Showing evaluate result.");
+                Context.Logger.LogInformation($"--------------------------");
+                Context.Logger.LogInformation(csproj.ToString());
+                return;
+            }
+
+            this.Context.Logger.LogInformation($"saving generated csproj to {scheme.output} (Override: {File.Exists(scheme.output)})");
+            if (File.Exists(scheme.output) && !scheme.allowoverwrite)
+            {
+                throw new IOException($"Output path {scheme.output} already exists. Please use `-allowoverwrite true`.");
+            }
+            csproj.Save(scheme.output);
+            this.Context.Logger.LogInformation($"complete! new csproj generated at {scheme.output}");
+        }
+    }
+
     [Command("node")]
     public class Node : ProjectBatchBase
     {
@@ -101,12 +247,13 @@ namespace dotnetcsproj
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
+            [Option("l", "leave brank line")]bool leaveBrankLine = false,
             bool dry = true,
             string output = "",
             bool allowoverwrite = false)
         {
             var csproj = Project.Load(path);
-            csproj.RemoveNode(group, node);
+            csproj.RemoveNode(group, node, leaveBrankLine);
             if (dry)
             {
                 this.Context.Logger.LogInformation(csproj.ToString());

@@ -1,0 +1,187 @@
+{
+    "path": "c:/original/bar.csproj",
+    "output": "c:/output/bar.csproj",
+    "dry": false,
+    "allowoverwrite": true,
+    "commands": [
+        {
+            "order": 0,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "OutputType",
+                "value": "Exe"
+            }
+        },
+        {
+            "order": 0,
+            "type": "node",
+            "command": "replace",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "OutputType",
+                "pattern": "Exe",
+                "replacement": "AppContainer"
+            }
+        },
+        {
+            "order": 0,
+            "type": "node",
+            "command": "remove",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "ProjectGuid",
+                "leaveBrankLine": false
+            }
+        },
+        {
+            "order": 0,
+            "type": "nodevalue",
+            "command": "set",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "RootNamespace",
+                "value": "SimpleCsProj",
+                "newValue": "FooBar"
+            }
+        },
+        {
+            "order": 0,
+            "type": "nodevalue",
+            "command": "append",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "RootNamespace",
+                "value": "SimpleCsProj",
+                "newvalue": ".Core"
+            }
+        },
+        {
+            "order": 0,
+            "type": "nodevalue",
+            "command": "prepend",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "RootNamespace",
+                "value": "SimpleCsProj",
+                "newvalue": "Core."
+            }
+        },
+        {
+            "order": 0,
+            "type": "nodevalue",
+            "command": "replace",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "RootNamespace",
+                "value": "SimpleCsProj",
+                "pattern": "Simple",
+                "replacement": "Complex"
+            }
+        },
+        {
+            "order": 0,
+            "type": "nodevalue",
+            "command": "remove",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "RootNamespace",
+                "value": "SimpleCsProj"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attribute",
+            "command": "insert",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Include",
+                "value": "App.cs"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attribute",
+            "command": "replace",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Include",
+                "value": "App.cs",
+                "pattern": "App",
+                "replacement": "Code"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attribute",
+            "command": "remove",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Include"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attributevalue",
+            "command": "set",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Compile",
+                "value": "FooBar.cs"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attributevalue",
+            "command": "append",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Compile",
+                "value": "Bar",
+                "newvalue": ".cs"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attributevalue",
+            "command": "prepend",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Compile",
+                "value": "Bar.cs",
+                "newvalue": "Foo"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attributevalue",
+            "command": "replace",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Compile",
+                "value": "Bar.cs",
+                "pattern": "Bar",
+                "replacement": "Foo"
+            }
+        },
+        {
+            "order": 0,
+            "type": "attributevalue",
+            "command": "remove",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Compile",
+                "value": "Bar.cs"
+            }
+        }
+    ]
+}

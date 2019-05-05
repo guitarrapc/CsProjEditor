@@ -1,4 +1,4 @@
-[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor)
+[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor) [![codecov](https://codecov.io/gh/guitarrapc/CsProjEditor/branch/master/graph/badge.svg)](https://codecov.io/gh/guitarrapc/CsProjEditor)
 
 ## CsProjEditor
 

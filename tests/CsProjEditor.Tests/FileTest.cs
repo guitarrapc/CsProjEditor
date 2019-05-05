@@ -11,10 +11,10 @@ namespace CsProjEditor.Tests
     public class FileTest
     {
         [Theory]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8LF.csproj", EolType.LF, "\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8_LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatPathLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -36,10 +36,10 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8LF.csproj", EolType.LF, "\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8_LF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatStreamLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -64,8 +64,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8BomCRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8BomLF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8Bom_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8Bom_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatPathLoadUtf8BomTest(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -87,8 +87,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8BomCRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/HololensUnityUwpNetAppUtf8BomLF.csproj", EolType.LF, "\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8Bom_CRLF.csproj", EolType.CRLF, "\r\n")]
+        [InlineData("testdata/HololensUnityUwpNetAppUtf8Bom_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatStreamLoadUtf8BomTest(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -114,7 +114,7 @@ namespace CsProjEditor.Tests
 
         [Theory]
         [InlineData("testdata/InvalidFormat.csproj")]
-        public void InvalidXmlFormatFailLoadTest(string csprojPath)
+        public void InvalidXmLFormatFailLoadTest(string csprojPath)
         {
             // Load Should throw
             Assert.Throws<XmlException>(() => CsProjEditor.Load(csprojPath));

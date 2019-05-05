@@ -1,0 +1,3 @@
+ text=auto
+*_LF.csproj text eol=lf
+*_CRLF.csproj text eol=crlf

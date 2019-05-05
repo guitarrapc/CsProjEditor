@@ -11,8 +11,8 @@ namespace CsProjEditor.Tests
     public class AttributeTests
     {
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -22,8 +22,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void GetFailest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -32,8 +32,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -48,8 +48,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void ExistsFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -66,8 +66,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void InsertTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -84,8 +84,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void InsertFailTest(string csprojPath)
         {
             // none existing group insertion will be throw
@@ -94,8 +94,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void SetTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -112,8 +112,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void SetFailTest(string csprojPath)
         {
             // none existing group insertion will be throw
@@ -123,8 +123,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -143,8 +143,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void ReplaceFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -161,8 +161,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void RemoveTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);
@@ -174,8 +174,8 @@ namespace CsProjEditor.Tests
         }
 
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8LF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
         public void RemoveFailTest(string csprojPath)
         {
             var csproj = CsProjEditor.Load(csprojPath);

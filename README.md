@@ -1,3 +1,5 @@
+[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor)
+
 ## CsProjEditor
 
 This library offers csproj element/attribute operation without EnvDTE.

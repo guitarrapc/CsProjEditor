@@ -13,8 +13,6 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8_LF.csproj", EolType.LF, "\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatPathLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success
@@ -37,8 +35,6 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
         [InlineData("testdata/HololensUnityUwpNetAppUtf8_LF.csproj", EolType.LF, "\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", EolType.CRLF, "\r\n")]
-        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", EolType.LF, "\n")]
         public void ValidCsprojFormatStreamLoadUtf8Test(string csprojPath, EolType eol, string eolString)
         {
             // Load Should be success

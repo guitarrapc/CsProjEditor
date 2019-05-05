@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
@@ -10,14 +11,24 @@
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
 
-    <Description>edit csproj without EnvDTE</Description>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>csprojcli</PackageId>
+    <Description>.NET CLI tool to edit csproj and other same format project file like vcxproj.</Description>
     <Authors>guitarrapc</Authors>
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/guitarrapc/CsProjEditor</PackageProjectUrl>
     <RepositoryUrl>https://github.com/guitarrapc/CsProjEditor</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>csproj</PackageTags>
+    <PackageTags>csproj;global-tools</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MicroBatchFramework" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CsProjEditor\CsProjEditor.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -13,11 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DF20F130-542
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{D4587483-FA1F-4F53-87B7-A0BF0E5EA9ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditor.ConsoleSample", "examples\CsProjEditor.ConsoleSample\CsProjEditor.ConsoleSample.csproj", "{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditorSample", "examples\CsProjEditorSample\CsProjEditorSample.csproj", "{412AF4D8-1CE0-43B0-BB9C-92B66A611A6F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{46DBD981-C728-4190-B07A-6D939150D100}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsProjEditor.Tests", "tests\CsProjEditor.Tests\CsProjEditor.Tests.csproj", "{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsProjEditor.Tests", "tests\CsProjEditor.Tests\CsProjEditor.Tests.csproj", "{623DDC79-EB05-47A4-A0BF-5F6F72E94FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

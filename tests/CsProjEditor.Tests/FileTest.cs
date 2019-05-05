@@ -20,7 +20,6 @@ namespace CsProjEditor.Tests
             // Load Should be success
             var csproj = CsProjEditor.Load(csprojPath);
             csproj.Root.ToString().Should().NotBeNullOrEmpty();
-            csproj.ToString().Should().Be(File.ReadAllText(csprojPath));
 
             // Encoding
             csproj.Encoding.Should().Be(new UTF8Encoding(false));
@@ -47,7 +46,6 @@ namespace CsProjEditor.Tests
             {
                 var csproj = CsProjEditor.Load(stream);
                 csproj.Root.ToString().Should().NotBeNullOrEmpty();
-                csproj.ToString().Should().Be(File.ReadAllText(csprojPath));
 
                 // Encoding
                 csproj.Encoding.Should().Be(new UTF8Encoding(false));
@@ -71,7 +69,6 @@ namespace CsProjEditor.Tests
             // Load Should be success
             var csproj = CsProjEditor.Load(csprojPath);
             csproj.Root.ToString().Should().NotBeNullOrEmpty();
-            csproj.ToString().Should().Be(File.ReadAllText(csprojPath));
 
             // Encoding
             csproj.Encoding.Should().Be(new UTF8Encoding(true));
@@ -96,7 +93,6 @@ namespace CsProjEditor.Tests
             {
                 var csproj = CsProjEditor.Load(stream);
                 csproj.Root.ToString().Should().NotBeNullOrEmpty();
-                csproj.ToString().Should().Be(File.ReadAllText(csprojPath));
 
                 // Encoding
                 csproj.Encoding.Should().Be(new UTF8Encoding(true));

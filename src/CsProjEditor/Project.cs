@@ -285,6 +285,48 @@ namespace CsProjEditor
         #region node operation
 
         /// <summary>
+        /// Get group's node values
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNodes(string group)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNodes(Root, group);
+        }
+        public string[] GetNodes(XElement root, string group)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group);
+            return elementsBase
+                .SelectMany(xs => xs.Elements().Select(y => y.Name.LocalName))
+                .ToArray();
+        }
+        /// <summary>
+        /// Get group's node values
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string[] GetNodes(string group, int index)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetNodes(Root, group, index);
+        }
+        public string[] GetNodes(XElement root, string group, int index)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group);
+            return elementsBase
+                .Skip(index).FirstOrDefault() // get index element
+                ?.Elements()
+                .Select(y => y.Name.LocalName)
+                .ToArray();
+        }
+        /// <summary>
         /// Get node's value
         /// </summary>
         /// <param name="group"></param>

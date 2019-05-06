@@ -76,8 +76,13 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
+            csproj.GetNode("PropertyGroup", "Hogemoge").Length.Should().Be(1);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
             csproj.ExistsNodeValue("PropertyGroup", "Hogemoge", "value").Should().BeTrue();
+
+            // Insert can add same value or any node
+            csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
+            csproj.GetNode("PropertyGroup", "Hogemoge").Length.Should().Be(2);
         }
 
         [Theory]

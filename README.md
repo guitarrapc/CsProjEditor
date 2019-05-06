@@ -144,10 +144,10 @@ more examples? check [examples](https://github.com/guitarrapc/CsProjEditor/tree/
 * [x] XmlUtils: Get space for each node
 * [x] Filter: filter node, nodevalue and attribute and pass as XElement
 * [x] Group: Get
-* [ ] Group: Exists
-* [ ] Group: Insert
-* [ ] Group: Remove
-* [ ] Group: Replace
+* [x] Group: Exists
+* [x] Group: Insert
+* [x] Group: Remove
+* [x] Group: Replace
 * [x] Node: Get
 * [x] Node: Exists
 * [x] Node: Insert

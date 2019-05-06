@@ -333,7 +333,7 @@ namespace CsProjEditor
                 root.ReplaceAll(eol, space);
                 foreach (var item in removed)
                 {
-                    root.Add(space, item, eol, space);
+                    root.Add(space, item, eol);
                 }
             }
         }
@@ -473,9 +473,10 @@ namespace CsProjEditor
         public void InsertNode(XElement root, string group, string node, string value, string eol)
         {
             var ns = root.Name.Namespace;
-            // validation
             var elementsBase = root.Elements(ns + group).Elements(ns + node).ToArray();
-            if (elementsBase.Any()) return;
+
+            // no validation for inserting node
+            //if (elementsBase.Any()) return;
 
             // get space
             var elements = elementsBase.Select(x => x?.ToString()).Where(x => x != null);

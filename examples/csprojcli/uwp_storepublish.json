@@ -1,6 +1,6 @@
 {
-    "path": "SimpleNewCsProjUtf8_CRLF.csproj",
-    "output": "result_SimpleNewCsProjUtf8_CRLF.csproj",
+    "path": "testdata/SimpleNewCsProjUtf8_CRLF.csproj",
+    "output": "testdata/result_SimpleNewCsProjUtf8_CRLF.csproj",
     "dry": false,
     "allowoverwrite": true,
     "commands": [

@@ -147,48 +147,52 @@ namespace CsProjEditor.Tests
         //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
         //}
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void RemoveTest(string csprojPath)
-        //{
-        //    // CRLF test will only run on windows
-        //    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && csprojPath.Contains("CRLF"))
-        //        return;
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void RemoveTest(string csprojPath)
+        {
+            // CRLF test will only run on windows
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && csprojPath.Contains("CRLF"))
+                return;
 
-        //    var csproj = Project.Load(csprojPath);
+            var csproj = Project.Load(csprojPath);
+            csproj.InsertGroup("Test");
+            csproj.InsertNode("Test", "Foo", "value");
 
-        //    // Remove with leave blank line test.
-        //    var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
-        //    csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
-        //    csproj.RemoveNode("PropertyGroup", "OutputType", true);
-        //    csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeFalse();
-        //    var afterCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
-        //    afterCount.Should().Be(beforeCount);
+            // Remove with leave blank line test.
+            var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
+            csproj.ExistsGroup("Test").Should().BeTrue();
+            var nodeCounts = csproj.GetNodes("Test").Length;
+            csproj.RemoveGroup("Test", true);
+            csproj.ExistsGroup("Test").Should().BeFalse();
+            var afterCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
+            afterCount.Should().Be(beforeCount - nodeCounts - 1);
 
-        //    // Remove node and remove blank line test.
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
-        //    csproj.RemoveNode("PropertyGroup", "ProjectGuid");
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeFalse();
-        //    // remove blankline will remove all blank line. In this case, previous remove's blank line also removed.
-        //    csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length.Should().Be(beforeCount - 1 - 1);
-        //}
+            // Remove node and remove blank line test.
+            csproj.InsertGroup("Test");
+            csproj.InsertNode("Test", "Foo", "value");
+            csproj.ExistsGroup("Test").Should().BeTrue();
+            csproj.RemoveGroup("Test");
+            csproj.ExistsGroup("Test").Should().BeFalse();
+            // remove blankline will remove all blank line. In this case, previous remove's blank line also removed.
+            csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length.Should().Be(beforeCount - 1 - 1 - 1);
+        }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void RemoveFailTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void RemoveFailTest(string csprojPath)
+        {
+            var csproj = Project.Load(csprojPath);
 
-        //    // not exists node will not do any.
-        //    var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
-        //    csproj.RemoveNode("PropertyGroup", "Hogemoge", true);
-        //}
+            // not exists node will not do any.
+            csproj.ExistsGroup("Test").Should().BeFalse();
+            csproj.RemoveGroup("Test", true);
+        }
     }
 }

@@ -12,13 +12,16 @@ namespace CsProjEditor.Tests
     public class NodeTests
     {
         [Theory]
-        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        public void GetTest(string csprojPath)
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", new[] { "None", "None", "SDKReference", "SDKReference", "Compile", "Content" }, new[] { "Compile" })]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", new[] { "None", "None", "SDKReference", "SDKReference", "Compile", "Content" }, new[] { "Compile" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PackageReference", "None", "None", "Compile" }, new[] { "None", "None", "Compile"})]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PackageReference", "None", "None", "Compile" }, new[] { "None", "None", "Compile" })]
+        public void GetTest(string csprojPath, string[] expected, string[] indexExpected)
         {
             var csproj = Project.Load(csprojPath);
+            csproj.GetNodes("ItemGroup").Should().BeEquivalentTo(expected);
+            csproj.GetNodes("ItemGroup", 1).Should().BeEquivalentTo(indexExpected);
+
             csproj.GetNode("PropertyGroup", "ProjectGuid").Should().BeEquivalentTo("ProjectGuid");
             csproj.GetNode("ItemGroup", "None").Should().BeEquivalentTo(new[] { "None", "None" });
             csproj.GetNode("Target", "Copy").Should().BeEquivalentTo(new[] { "Copy", "Copy" });

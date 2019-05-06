@@ -204,17 +204,22 @@ namespace CsProjEditor
         /// Get groups
         /// </summary>
         /// <returns></returns>
-        public string[] GetGroup()
+        public string[] GetGroups()
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
-            return GetGroup(Root);
+            return GetGroups(Root);
         }
-        public string[] GetGroup(XElement root)
+        public string[] GetGroups(XElement root)
         {
             var ns = root.Name.Namespace;
             var elementsBase = root.Elements();
             return elementsBase.Select(x => x.Name.LocalName).ToArray();
         }
+
+        /// <summary>
+        /// Get group
+        /// </summary>
+        /// <returns></returns>
         public string[] GetGroup(string group)
         {
             if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");

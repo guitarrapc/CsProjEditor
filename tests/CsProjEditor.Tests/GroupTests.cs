@@ -29,7 +29,7 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.GetGroup("PropertyGroup").Should().BeEquivalentTo(expected);
 
-            csproj.GetGroup().Should().BeEquivalentTo(expected2);
+            csproj.GetGroups().Should().BeEquivalentTo(expected2);
         }
 
         [Theory]

@@ -198,6 +198,38 @@ namespace CsProjEditor
 
         #endregion
 
+        #region group operation
+
+        /// <summary>
+        /// Get groups
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetGroup()
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetGroup(Root);
+        }
+        public string[] GetGroup(XElement root)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements();
+            return elementsBase.Select(x => x.Name.LocalName).ToArray();
+        }
+        public string[] GetGroup(string group)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return GetGroup(Root, group);
+        }
+        public string[] GetGroup(XElement root, string group)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group);
+            return elementsBase.Select(x => x.Name.LocalName).ToArray();
+        }
+
+
+        #endregion
+
         #region node operation
 
         /// <summary>

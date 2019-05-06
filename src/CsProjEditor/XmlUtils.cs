@@ -53,7 +53,7 @@ namespace CsProjEditor
                 ? CalculateIndent(entries, insideElement, eol)
                 : 0;
             var diff = insideElementSpace - elementSpace;
-            var space = diff >= 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
+            var space = diff > 0 ? new string(' ', diff) : new string(' ', baseSpaceNum);
             return space;
         }
 

@@ -43,15 +43,25 @@ namespace csprojcli
         [Command(new[] { "help", "list", "-h", "-help", "--help" }, "show help")]
         public void Help()
         {
-            Context.Logger.LogInformation("Usage: csprojcli [version] [help] [batch.loadandrun|batch.run|node.get|node.exists|node.insert|node.replace|node.remove|nodevalue.get|nodevalue.exists|nodevalue.set|nodevalue.append|nodevalue.prepend|nodevalue.replace|nodevalue.remove|attribute.get|attribute.exists|attribute.insert|attribute.replace|attribute.remove|attributevalue.get|attributevalue.exists|attributevalue.set|attributevalue.append|attributevalue.prepend|attributevalue.replace|attributevalue.remove] [parameters]");
+            Context.Logger.LogInformation("Usage: csprojcli [version] [help] [batch.loadandrun|batch.run|groups.get|group.get|group.exists|group.insert|group.replace|group.remove|nodes.get|node.get|node.exists|node.insert|node.replace|node.remove|nodevalue.get|nodevalue.exists|nodevalue.set|nodevalue.append|nodevalue.prepend|nodevalue.replace|nodevalue.remove|attribute.get|attribute.exists|attribute.insert|attribute.replace|attribute.remove|attributevalue.get|attributevalue.exists|attributevalue.set|attributevalue.append|attributevalue.prepend|attributevalue.replace|attributevalue.remove] [parameters]");
             Console.WriteLine();
             Context.Logger.LogInformation("E.g., run this for Batch execution. see JSON sample at https://raw.githubusercontent.com/guitarrapc/CsProjEditor/master/src/csprojcli/sample.json ");
             Context.Logger.LogInformation("--------------------------");
             Context.Logger.LogInformation("$ csprojcli batch.loadandrun -jsonPath examples/csprojcli/uwp_storepublish.json");
             Context.Logger.LogInformation("$ csprojcli batch.run -json JSON");
             Console.WriteLine();
+            Context.Logger.LogInformation("E.g., run this for group execution.:");
+            Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli groups.get -p SimpleNewCsProjUtf8_CRLF.csproj");
+            Context.Logger.LogInformation("$ csprojcli group.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup");
+            Context.Logger.LogInformation("$ csprojcli group.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup");
+            Context.Logger.LogInformation("$ csprojcli group.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli group.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -pattern Property -replacement Foo -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Context.Logger.LogInformation("$ csprojcli group.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
+            Console.WriteLine();
             Context.Logger.LogInformation("E.g., run this for node execution.:");
             Context.Logger.LogInformation("--------------------------");
+            Context.Logger.LogInformation("$ csprojcli nodes.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup");
             Context.Logger.LogInformation("$ csprojcli node.get -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework");
             Context.Logger.LogInformation("$ csprojcli node.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n TargetFramework");
             Context.Logger.LogInformation("$ csprojcli node.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n PackageCertificateThumbprint -v 1234567890ABCDEF -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true");
@@ -123,7 +133,24 @@ namespace csprojcli
                     continue;
                 }
 
-                if (command.type == "node")
+                if (command.type == "group")
+                {
+                    switch (command.command)
+                    {
+                        case "insert":
+                            csproj.InsertGroup(command.parameter.group);
+                            break;
+                        case "replace":
+                            csproj.ReplaceGroup(command.parameter.group, command.parameter.pattern, command.parameter.replacement);
+                            break;
+                        case "remove":
+                            csproj.RemoveGroup(command.parameter.group, command.parameter.leaveBrankLine);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else if (command.type == "node")
                 {
                     switch (command.command)
                     {
@@ -229,6 +256,110 @@ namespace csprojcli
             this.Context.Logger.LogInformation($"complete! new csproj generated at {scheme.output}");
         }
 
+        [Command("groups.get", "get group.")]
+        public void GroupGet([Option("p", "path of csproj.")]string path)
+        {
+            var results = Project.Load(path).GetGroups();
+
+            if (!results.Any()) this.Context.Logger.LogInformation($"group not found.");
+            foreach (var item in results)
+            {
+                this.Context.Logger.LogInformation(item);
+            }
+        }
+        [Command("group.get", "get group.")]
+        public void GroupGet(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group)
+        {
+            var results = Project.Load(path).GetGroup(group);
+
+            if (!results.Any()) this.Context.Logger.LogInformation($"group `{group}` not found.");
+            foreach (var item in results)
+            {
+                this.Context.Logger.LogInformation($"{group}: {item}");
+            }
+        }
+        [Command("group.exists", "check specified group is exists.")]
+        public void GroupExists(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group)
+        {
+            var item = Project.Load(path).ExistsGroup(group);
+            this.Context.Logger.LogInformation(item.ToString());
+        }
+        [Command("group.insert", "insert specified group.")]
+        public void GroupInsert(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group,
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.InsertGroup(group);
+            if (dry)
+            {
+                this.Context.Logger.LogInformation(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
+        }
+        [Command("group.replace", "replace specified group.")]
+        public void GroupReplace(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group,
+            string pattern,
+            string replacement,
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.ReplaceGroup(group, pattern, replacement);
+            if (dry)
+            {
+                this.Context.Logger.LogInformation(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
+        }
+
+        [Command("group.remove", "remove specified group.")]
+        public void GroupRemove(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group,
+            [Option("l", "leave brank line")]bool leaveBrankLine = false,
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.RemoveGroup(group, leaveBrankLine);
+            if (dry)
+            {
+                this.Context.Logger.LogInformation(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
+        }
+
+        [Command("nodes.get", "get nodes for the group.")]
+        public void NodesGet(
+            [Option("p", "path of csproj.")]string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")]string group,
+            int index = -1)
+        {
+            var results = index < 0
+                ? Project.Load(path).GetNodes(group)
+                : Project.Load(path).GetNodes(group, index);
+
+            if (!results.Any()) this.Context.Logger.LogInformation($"index `{index}` not found.");
+            foreach (var item in results)
+            {
+                this.Context.Logger.LogInformation($"{group}[{index}]: {item}");
+            }
+        }
         [Command("node.get", "get node for the group.")]
         public void NodeGet(
             [Option("p", "path of csproj.")]string path,

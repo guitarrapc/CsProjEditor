@@ -103,49 +103,50 @@ namespace CsProjEditor.Tests
             // no test.
         }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void ReplaceTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
-        //    // simple replacement
-        //    csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
-        //    csproj.ReplaceNode("PropertyGroup", "OutputType", "Hogemoge");
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ReplaceTest(string csprojPath)
+        {
+            var csproj = Project.Load(csprojPath);
+            // simple replacement
+            csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
+            csproj.ReplaceGroup("PropertyGroup", "Hogemoge");
+            csproj.ExistsGroup("Hogemoge").Should().BeTrue();
 
-        //    // replacement can specify which letter to replace with via `pattern`.
-        //    // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
-        //    csproj.ReplaceNode("PropertyGroup", "ProjectGuid", "Guid", "Hogemoge");
-        //    csproj.ExistsNode("PropertyGroup", "ProjectHogemoge").Should().BeTrue();
-        //}
+            // replacement can specify which letter to replace with via `pattern`.
+            // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
+            csproj.ExistsGroup("ItemGroup").Should().BeTrue();
+            csproj.ReplaceGroup("ItemGroup", "Item", "Piyo");
+            csproj.ExistsGroup("PiyoGroup").Should().BeTrue();
+        }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void ReplaceFailTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ReplaceFailTest(string csprojPath)
+        {
+            var csproj = Project.Load(csprojPath);
 
-        //    // not exists node will not do any.
-        //    csproj.ExistsNode("PropertyGroup", "OutputTypeHoge").Should().BeFalse();
-        //    csproj.ReplaceNode("PropertyGroup", "OutputTypeHoge", "Hogemoge");
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
+            // not exists node will not do any.
+            csproj.ExistsGroup("HogemogeGroup").Should().BeFalse();
+            csproj.ReplaceGroup("HogemogeGroup", "FugaFuga");
+            csproj.ExistsGroup("FugaFuga").Should().BeFalse();
 
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuidHoge").Should().BeFalse();
-        //    csproj.ReplaceNode("PropertyGroup", "ProjectGuidHoge", "Guid", "Hogemoge");
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuidHoge").Should().BeFalse();
-        //    csproj.ExistsNode("PropertyGroup", "ProjectHogemogeHoge").Should().BeFalse();
+            csproj.ExistsGroup("HogemogeGroup").Should().BeFalse();
+            csproj.ReplaceGroup("HogemogeGroup", "Hogemoge", "FugaFuga");
+            csproj.ExistsGroup("HogemogeGroup").Should().BeFalse();
+            csproj.ExistsGroup("FugaFugaGroup").Should().BeFalse();
 
-        //    csproj.ExistsNode("PropertyGroup", "Out").Should().BeFalse();
-        //    csproj.ReplaceNode("PropertyGroup", "Out", "Hogemoge");
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
-        //}
+            csproj.ExistsGroup("ItemFoo").Should().BeFalse();
+            csproj.ReplaceGroup("ItemFoo", "Hoge", "Fuga");
+            csproj.ExistsGroup("ItemFoo").Should().BeFalse();
+            csproj.ExistsGroup("Hoge").Should().BeFalse();
+        }
 
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]

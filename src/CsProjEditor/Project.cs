@@ -332,6 +332,40 @@ namespace CsProjEditor
                 }
             }
         }
+
+        /// <summary>
+        /// Replace group
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="replacement"></param>
+        /// <param name="option"></param>
+        public void ReplaceGroup(string group, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceGroup(Root, group, group, replacement, option);
+        }
+        public void ReplaceGroup(string group, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            ReplaceGroup(Root, group, pattern, replacement, option);
+        }
+        public void ReplaceGroup(XElement root, string group, string pattern, string replacement, RegexOptions option = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements(ns + group).ToArray();
+            if (!elementsBase.Any()) return;
+
+            // replace node.
+            var origin = root.Element(ns + group);
+            var replaced = Regex.Replace(origin.Name.LocalName, pattern, replacement, option);
+            if (origin.Name.LocalName != replaced)
+            {
+                origin.Name = ns + replaced;
+            }
+        }
+
         #endregion
 
         #region node operation

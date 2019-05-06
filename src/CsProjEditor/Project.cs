@@ -227,6 +227,58 @@ namespace CsProjEditor
             return elementsBase.Select(x => x.Name.LocalName).ToArray();
         }
 
+        /// <summary>
+        /// Check group is exists or not
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public bool ExistsGroup(string group)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            return ExistsGroup(Root, group);
+        }
+        public bool ExistsGroup(XElement root, string group)
+        {
+            var ns = root.Name.Namespace;
+            var elementsBase = root.Elements(ns + group);
+            return elementsBase.Any();
+        }
+
+        /// <summary>
+        /// Insert node
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="node"></param>
+        /// <param name="value"></param>
+        public void InsertGroup(string group)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            InsertGroup(Root, group, Eol.ToEolString());
+        }
+        public void InsertGroup(XElement root, string group)
+        {
+            if (!Initialized) throw new Exception("Detected not yet initialized, please run Load() first.");
+            InsertGroup(root, group, Eol.ToEolString());
+        }
+        public void InsertGroup(XElement root, string group, string eol)
+        {
+            var ns = root.Name.Namespace;
+            // validation
+            var elementsBase = root.Elements().ToArray();
+
+            // get space
+            var elements = elementsBase.Select(x => x?.ToString()).Where(x => x != null);
+            if (ns != null)
+            {
+                var nsString = GetNameSpace(root, ns);
+                elements = elements.Select(x => x.Replace(nsString, ""));
+            }
+            var space = GetIndentSpace(root, $"<{group}>", elements.ToArray(), eol);
+
+            // insert group
+            root.Add(space, new XElement(ns + group, eol, space), eol);
+        }
 
         #endregion
 

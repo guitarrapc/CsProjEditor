@@ -40,62 +40,68 @@ namespace CsProjEditor.Tests
         public void GetFailTest(string csprojPath)
         {
             var csproj = Project.Load(csprojPath);
-            csproj.GetGroup("PropertyGroups").Should().BeEmpty();
-            csproj.GetGroup("ItemGroups").Should().BeEmpty();
-            csproj.GetGroup("Targets").Should().BeEmpty();
+            csproj.GetGroup("PropertyGroupX").Should().BeEmpty();
+            csproj.GetGroup("ItemGroupX").Should().BeEmpty();
+            csproj.GetGroup("TargetX").Should().BeEmpty();
         }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void ExistsTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
-        //    csproj.ExistsNode("PropertyGroup", "ProjectGuid").Should().BeTrue();
-        //    csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
-        //    csproj.ExistsNode("Target", "Copy").Should().BeTrue();
-        //}
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ExistsTest(string csprojPath)
+        {
+            var csproj = Project.Load(csprojPath);
+            csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
+            csproj.ExistsGroup("ItemGroup").Should().BeTrue();
+            csproj.ExistsGroup("Target").Should().BeTrue();
+        }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void ExistsFailTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
-        //    csproj.ExistsNode("PropertyGroup", "HogemogeNotExists").Should().BeFalse();
-        //    csproj.ExistsNode("ItemGroup", "HogemogeNotExists").Should().BeFalse();
-        //    csproj.ExistsNode("Target", "HogemogeNotExists").Should().BeFalse();
-        //}
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ExistsFailTest(string csprojPath)
+        {
+            var csproj = Project.Load(csprojPath);
+            csproj.ExistsGroup("PropertyGroupX").Should().BeFalse();
+            csproj.ExistsGroup("ItemGroupX").Should().BeFalse();
+            csproj.ExistsGroup("TargetX").Should().BeFalse();
+        }
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void InsertTest(string csprojPath)
-        //{
-        //    var csproj = Project.Load(csprojPath);
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
-        //    csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
-        //    csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
-        //    csproj.ExistsNodeValue("PropertyGroup", "Hogemoge", "value").Should().BeTrue();
-        //}
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
+        public void InsertTest(string csprojPath, string[] expected)
+        {
+            var csproj = Project.Load(csprojPath);
+            // additional existing group
+            csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
+            csproj.InsertGroup("PropertyGroup");
+            csproj.GetGroup("PropertyGroup").Should().BeEquivalentTo(expected);
 
-        //[Theory]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
-        //[InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
-        //public void InsertFailTest(string csprojPath)
-        //{
-        //    // none existing group insertion will be throw
-        //    var csproj = Project.Load(csprojPath);
-        //    Assert.Throws<NullReferenceException>(() => csproj.InsertNode("Hogemoge", "Hogemoge", "value"));
-        //}
+            // new group
+            csproj.ExistsGroup("Test").Should().BeFalse();
+            csproj.InsertGroup("Test");
+            csproj.ExistsGroup("Test").Should().BeTrue();
+            csproj.GetGroup("Test").Should().BeEquivalentTo("Test");
+            csproj.InsertNode("Test", "Hoge", "Value");
+            csproj.ExistsNodeValue("Test", "Hoge", "Value").Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void InsertFailTest(string csprojPath)
+        {
+            // no test.
+        }
 
         //[Theory]
         //[InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]

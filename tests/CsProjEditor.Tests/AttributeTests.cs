@@ -17,6 +17,12 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
+            // <Project>
+            //   <ItemGroup>
+            //     <None />
+            //   </ItemGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.GetAttribute("ItemGroup", "None").Should().Contain("Include");
@@ -42,6 +48,16 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
+            // <Project>
+            //   <ItemGroup>
+            //     <None Include/>
+            //     <Compile Include/>
+            //   </ItemGroup>
+            //   <Target>
+            //     <Message Importance/>
+            //   </Target>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttribute("ItemGroup", "None", "Include").Should().BeTrue();
@@ -80,6 +96,14 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void InsertTest(string csprojPath)
         {
+            // <Project>
+            //   <PropertyGroup>
+            //     <Hogemoge>value</Hogemoge>
+            //     <Hogemoge Fugafuga="Value"/>
+            //     <OutputType Fugafuga="Value"/>
+            //   </PropertyGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
@@ -89,6 +113,7 @@ namespace CsProjEditor.Tests
             csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
             csproj.InsertAttribute("PropertyGroup", "OutputType", "Fugafuga", "Value", e => !e.HasAttributes);
             csproj.ExistsAttributeValue("PropertyGroup", "OutputType", "Fugafuga", "Value").Should().BeTrue();
+            var x = csproj.ToString();
             // Insert will generate node and attribute
             csproj.GetNode("PropertyGroup", "OutputType").Should().BeEquivalentTo(new[] { "OutputType", "OutputType" });
         }
@@ -112,6 +137,12 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void SetTest(string csprojPath)
         {
+            // <Project>
+            //   <PropertyGroup>
+            //     <Hogemoge Fugafuga="Value">value</Hogemoge>
+            //   </PropertyGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
@@ -121,6 +152,7 @@ namespace CsProjEditor.Tests
             csproj.ExistsNode("PropertyGroup", "OutputType").Should().BeTrue();
             csproj.SetAttribute("PropertyGroup", "OutputType", "Fugafuga", "Value", e => !e.HasAttributes);
             csproj.ExistsAttributeValue("PropertyGroup", "OutputType", "Fugafuga", "Value").Should().BeTrue();
+            var x = csproj.ToString();
             // Insert will generate node and attribute
             csproj.GetNode("PropertyGroup", "OutputType").Should().BeEquivalentTo(new[] { "OutputType" });
         }
@@ -145,18 +177,57 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
+            // before
+            // <Project>
+            //   <ItemGroup>
+            //     <None Include="project.json" />
+            //   </ItemGroup>
+            // </Project>
+
+            // after
+            // <Project>
+            //   <ItemGroup>
+            //     <None Hogemoge="project.json" />
+            //   </ItemGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             // simple replacement
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttribute("ItemGroup", "None", "Include").Should().BeTrue();
             csproj.ReplaceAttribute("ItemGroup", "None", "Include", "project.json", "Hogemoge");
+            var x = csproj.ToString();
             csproj.ExistsAttribute("ItemGroup", "None", "Hogemoge").Should().BeTrue();
+        }
 
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ReplaceWithPatternTest(string csprojPath)
+        {
+            // before
+            // <Project>
+            //   <ItemGroup>
+            //     <Compile Include="App.cs" />
+            //   </ItemGroup>
+            // </Project>
+
+            // after
+            // <Project>
+            //   <ItemGroup>
+            //     <Compile Exclude="App.cs" />
+            //   </ItemGroup>
+            // </Project>
+
+            var csproj = Project.Load(csprojPath);
             // replacement can specify which letter to replace with via `pattern`.
             // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
             csproj.ExistsNode("ItemGroup", "Compile").Should().BeTrue();
             csproj.ReplaceAttribute("ItemGroup", "Compile", "Include", "App.cs", "In", "Ex");
             csproj.ExistsAttribute("ItemGroup", "Compile", "Exclude").Should().BeTrue();
+            var x = csproj.ToString();
             csproj.ExistsAttributeValue("ItemGroup", "Compile", "Exclude", "App.cs").Should().BeTrue();
         }
 
@@ -187,11 +258,25 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void RemoveTest(string csprojPath)
         {
+            // before
+            // <Project>
+            //   <ItemGroup>
+            //     <None Include="project.json" />
+            //   </ItemGroup>
+            // </Project>
+
+            // after
+            // <Project>
+            //   <ItemGroup>
+            //     <None />
+            //   </ItemGroup>
+            // </Project>
             var csproj = Project.Load(csprojPath);
 
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeTrue();
             csproj.RemoveAttribute("ItemGroup", "None", "Include", "project.json");
+            var x = csproj.ToString();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeFalse();
         }
 

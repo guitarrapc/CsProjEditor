@@ -6,6 +6,7 @@
     <ProjectGuid>{721f98d5-49a4-41a0-8bd2-76ef253c61dc}</ProjectGuid>
     <RootNamespace>SimpleCsProj</RootNamespace>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MicroBatchFramework" Version="1.2.0" />
   </ItemGroup>

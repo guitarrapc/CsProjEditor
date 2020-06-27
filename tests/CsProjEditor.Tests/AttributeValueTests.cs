@@ -17,6 +17,12 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
+            // </Project>
+            //   <ItemGroup>
+            //    <None/>
+            //   </ItemGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.GetAttributeValue("ItemGroup", "None", "Include").Should().BeEquivalentTo(new[] { "project.json", "sample.json" });
@@ -41,6 +47,15 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
+            // <Project>
+            //   <ItemGroup>
+            //    <None Include="project.json" />
+            //    <Compile Include="App.cs" />
+            //   </ItemGroup>
+            //   <Target>
+            //    <Message Importance="high" />
+            //   </Target>
+            // </Project>
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeTrue();

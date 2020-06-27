@@ -8,3 +8,13 @@ charset = utf-8
 end_of_line = lf
 indent_size = 4
 insert_final_newline = true
+
+[*_CRLF.csproj]
+end_of_line = crlf
+indent_size = 4
+insert_final_newline = true
+
+[*_LF.csproj]
+end_of_line = lf
+indent_size = 4
+insert_final_newline = true

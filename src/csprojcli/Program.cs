@@ -202,13 +202,34 @@ namespace csprojcli
                     switch (command.command)
                     {
                         case "insert":
-                            csproj.InsertAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, e => !e.HasAttributes);
+                            if (string.IsNullOrEmpty(command.parameter.node))
+                            {
+                                csproj.InsertAttribute(command.parameter.group, command.parameter.attribute, command.parameter.value, e => !e.HasAttributes);
+                            }
+                            else
+                            {
+                                csproj.InsertAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, e => !e.HasAttributes);
+                            }
                             break;
                         case "replace":
-                            csproj.ReplaceAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            if (string.IsNullOrEmpty(command.parameter.node))
+                            {
+                                csproj.ReplaceAttributeWithPattern(command.parameter.group, command.parameter.attribute, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            }
+                            else
+                            {
+                                csproj.ReplaceAttributeWithPattern(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value, command.parameter.pattern, command.parameter.replacement);
+                            }
                             break;
                         case "remove":
-                            csproj.RemoveAttribute(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value);
+                            if (string.IsNullOrEmpty(command.parameter.node))
+                            {
+                                csproj.RemoveAttributeForValue(command.parameter.group, command.parameter.attribute, command.parameter.value);
+                            }
+                            else
+                            {
+                                csproj.RemoveAttributeForValue(command.parameter.group, command.parameter.node, command.parameter.attribute, command.parameter.value);
+                            }
                             break;
                         default:
                             throw new NotImplementedException();
@@ -623,7 +644,7 @@ namespace csprojcli
             bool allowoverwrite = false)
         {
             var csproj = Project.Load(path);
-            csproj.ReplaceAttribute(group, node, attribute, value, pattern, replacement);
+            csproj.ReplaceAttributeWithPattern(group, node, attribute, value, pattern, replacement);
             if (dry)
             {
                 this.Context.Logger.LogInformation(csproj.ToString());

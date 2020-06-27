@@ -8,7 +8,7 @@ using Xunit;
 
 namespace CsProjEditor.Tests
 {
-    public class AttributeTests
+    public class NodeAttributeTests
     {
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
@@ -106,7 +106,6 @@ namespace CsProjEditor.Tests
 
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
-            csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
             csproj.InsertAttribute("PropertyGroup", "Hogemoge", "Fugafuga", "Value", e => !e.HasAttributes);
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "Fugafuga", "Value").Should().BeTrue();
 
@@ -225,7 +224,7 @@ namespace CsProjEditor.Tests
             // replacement can specify which letter to replace with via `pattern`.
             // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
             csproj.ExistsNode("ItemGroup", "Compile").Should().BeTrue();
-            csproj.ReplaceAttribute("ItemGroup", "Compile", "Include", "App.cs", "In", "Ex");
+            csproj.ReplaceAttributeWithPattern("ItemGroup", "Compile", "Include", "App.cs", "In", "Ex");
             csproj.ExistsAttribute("ItemGroup", "Compile", "Exclude").Should().BeTrue();
             var x = csproj.ToString();
             csproj.ExistsAttributeValue("ItemGroup", "Compile", "Exclude", "App.cs").Should().BeTrue();
@@ -275,7 +274,7 @@ namespace CsProjEditor.Tests
 
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeTrue();
-            csproj.RemoveAttribute("ItemGroup", "None", "Include", "project.json");
+            csproj.RemoveAttributeForValue("ItemGroup", "None", "Include", "project.json");
             var x = csproj.ToString();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeFalse();
         }
@@ -292,7 +291,7 @@ namespace CsProjEditor.Tests
             // not exists node will not do any.
             csproj.ExistsNode("ItemGroup", "NoneX").Should().BeFalse();
             csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
-            csproj.RemoveAttribute("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0");
+            csproj.RemoveAttributeForValue("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0");
             csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0").Should().BeFalse();
         }
     }

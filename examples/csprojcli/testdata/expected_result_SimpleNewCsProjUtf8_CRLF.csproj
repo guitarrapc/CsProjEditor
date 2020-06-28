@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Exe</OutputType>
+    <ProjectGuid>{721f98d5-49a4-41a0-8bd2-76ef253c61dc}</ProjectGuid>
+    <RootNamespace>SimpleCsProj</RootNamespace>
+    <AssemblyName>SimpleCsProj</AssemblyName>
+    <PackageCertificateThumbprint>1234567890ABCDEF</PackageCertificateThumbprint>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
+    <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MicroBatchFramework" Version="1.2.0" />
+    <None Include="hogehoge.pfx" />
+    <None>Package.StoreAssociation.xml</None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="project.json" />
+    <None Include="sample.json" />
+    <Compile Include="App.cs" />
+    <Compile Include="Check.cs" />
+  </ItemGroup>
+
+  <Target>
+    <Message Importance="high" Text="UnityWSAPlayerDir &quot;$(UnityWSAPlayerDir)&quot;." />
+    <Copy SourceFiles="$(ProjectDir)Plugins\$(PlatformShortName)\PlaneFinding.dll" DestinationFiles="$(ProjectDir)PlaneFinding.dll" />
+  </Target>
+  <Target>
+    <Copy SourceFiles="@(UnprocessedFile)" DestinationFolder="$(ProjectDir)" />
+  </Target>
+
+</Project>

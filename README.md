@@ -1,6 +1,6 @@
 ## CsProjEditor
 
-[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor) [![codecov](https://codecov.io/gh/guitarrapc/CsProjEditor/branch/master/graph/badge.svg)](https://codecov.io/gh/guitarrapc/CsProjEditor) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) 
+[![Build Status](https://cloud.drone.io/api/badges/guitarrapc/CsProjEditor/status.svg)](https://cloud.drone.io/guitarrapc/CsProjEditor) [![codecov](https://codecov.io/gh/guitarrapc/CsProjEditor/branch/master/graph/badge.svg)](https://codecov.io/gh/guitarrapc/CsProjEditor) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 [![NuGet](https://img.shields.io/nuget/v/CsProjEditor.svg?label=CsProjEditor%20nuget)](https://www.nuget.org/packages/CsProjEditor) [![NuGet](https://img.shields.io/nuget/v/csprojcli.svg?label=csprojcli%20nuget)](https://www.nuget.org/packages/csprojcli)
 
@@ -67,7 +67,7 @@ You can find help.
 > csprojcli help
 ```
 
-You can run for each operation for `group.*`, `node.*`, `nodevalue.*`, `attrribute.*` and `attributevalue.*`. 
+You can run for each operation for `group.*`, `node.*`, `nodevalue.*`, `attrribute.*` and `attributevalue.*`.
 
 here's all commands and examples, you can reproduce with commands running at `examples/csprojcli`.
 
@@ -107,7 +107,15 @@ $ csprojcli nodevalue.prepend -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGrou
 $ csprojcli nodevalue.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n OutputType -v Exe -pattern Exe -replacement AppContainer -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 $ csprojcli nodevalue.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g PropertyGroup -n AssemblyName -v SimpleCsProj -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 
-E.g., run this for attribute execution.:
+E.g., run this for group attribute execution.:
+--------------------------
+$ csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g Import
+$ csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include
+$ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include -v example.json -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+$ csprojcli attribute.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include -v project.json -pattern None -replacement Content -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+$ csprojcli attribute.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Exclude -dry false -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+
+E.g., run this for node attribute execution.:
 --------------------------
 $ csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None
 $ csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include

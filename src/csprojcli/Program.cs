@@ -587,6 +587,19 @@ namespace csprojcli
 
         [Command("attribute.get", "get attribute for the group.")]
         public void AttributeGet(
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group)
+        {
+            var results = Project.Load(path).GetAttribute(group);
+
+            if (!results.Any()) Console.WriteLine($"group `{group}` not found.");
+            foreach (var item in results)
+            {
+                Console.WriteLine($"{group}: {item}");
+            }
+        }
+        [Command("attribute.get", "get attribute for the group.")]
+        public void AttributeGet(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node)
@@ -601,6 +614,15 @@ namespace csprojcli
         }
         [Command("attribute.exists", "check specified attribute is exists.")]
         public void AttributeExists(
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group,
+            [Option("a", "attribute of group")] string attribute)
+        {
+            var item = Project.Load(path).ExistsAttribute(group, new CsProjAttribute(attribute));
+            Console.WriteLine(item.ToString());
+        }
+        [Command("attribute.exists", "check specified attribute is exists.")]
+        public void AttributeExists(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
@@ -608,6 +630,25 @@ namespace csprojcli
         {
             var item = Project.Load(path).ExistsAttribute(group, node, new CsProjAttribute(attribute));
             Console.WriteLine(item.ToString());
+        }
+        [Command("attribute.insert", "insert specified attribute.")]
+        public void AttributeInsert(
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group,
+            [Option("a", "attribute of group")] string attribute,
+            [Option("v", "value of attribute")] string value = "",
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.InsertAttribute(group, new CsProjAttribute(attribute, value), e => !e.HasAttributes);
+            if (dry)
+            {
+                Console.WriteLine(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
         }
         [Command("attribute.insert", "insert specified attribute.")]
         public void AttributeInsert(
@@ -622,6 +663,27 @@ namespace csprojcli
         {
             var csproj = Project.Load(path);
             csproj.InsertAttribute(group, node, new CsProjAttribute(attribute, value), e => !e.HasAttributes);
+            if (dry)
+            {
+                Console.WriteLine(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
+        }
+        [Command("attribute.replace", "replace specified attribute with node.")]
+        public void AttributeReplace(
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group,
+            [Option("a", "attribute of group")] string attribute,
+            [Option("v", "value of attribute")] string value,
+            string pattern,
+            string replacement,
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.ReplaceAttribute(group, new CsProjAttribute(attribute, value), pattern, replacement);
             if (dry)
             {
                 Console.WriteLine(csproj.ToString());
@@ -651,7 +713,24 @@ namespace csprojcli
             }
             Save(csproj, path, output, allowoverwrite);
         }
-
+        [Command("attribute.remove", "remove specified attribute.")]
+        public void AttributeRemove(
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group,
+            [Option("a", "attribute of group")] string attribute,
+            bool dry = true,
+            string output = "",
+            bool allowoverwrite = false)
+        {
+            var csproj = Project.Load(path);
+            csproj.RemoveAttribute(group, new CsProjAttribute(attribute));
+            if (dry)
+            {
+                Console.WriteLine(csproj.ToString());
+                return;
+            }
+            Save(csproj, path, output, allowoverwrite);
+        }
         [Command("attribute.remove", "remove specified attribute.")]
         public void AttributeRemove(
             [Option("p", "path of csproj.")]string path,

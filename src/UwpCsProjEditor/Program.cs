@@ -77,8 +77,8 @@ namespace UwpCsProjEdior
             csproj.InsertNode("PropertyGroup", "AppxBundlePlatforms", "x86");
             csproj.InsertNode("PropertyGroup", "AppInstallerUpdateFrequency", "1");
             csproj.InsertNode("PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
-            csproj.InsertAttribute("ItemGroup", "None", "Include", pfx, x => !x.HasAttributes);
-            csproj.InsertAttribute("ItemGroup", "None", "Include", "Package.StoreAssociation.xml", x => !x.HasAttributes);
+            csproj.InsertAttribute("ItemGroup", "None", new CsProjAttribute("Include", pfx), x => !x.HasAttributes);
+            csproj.InsertAttribute("ItemGroup", "None", new CsProjAttribute("Include", "Package.StoreAssociation.xml"), x => !x.HasAttributes);
         }
     }
 }

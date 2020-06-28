@@ -19,11 +19,11 @@ namespace CsProjEditor.Tests
             new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" },
             new[] { "Import", "Import", "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "ItemGroup", "PropertyGroup", "Import", "Target", "Target", "PropertyGroup" })]
         [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj",
-            new[] { "PropertyGroup" },
-            new[] { "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
+            new[] { "PropertyGroup", "PropertyGroup" },
+            new[] { "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj",
-            new[] { "PropertyGroup" },
-            new[] { "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
+            new[] { "PropertyGroup", "PropertyGroup" },
+            new[] { "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
         public void GetTest(string csprojPath, string[] expected, string[] expected2)
         {
             // <Project>
@@ -32,6 +32,7 @@ namespace CsProjEditor.Tests
             // </Project>
 
             var csproj = Project.Load(csprojPath);
+            var x = csproj.GetGroup("PropertyGroup");
             csproj.GetGroup("PropertyGroup").Should().BeEquivalentTo(expected);
 
             csproj.GetGroups().Should().BeEquivalentTo(expected2);
@@ -88,8 +89,8 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
-        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
-        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
         public void InsertExistingTest(string csprojPath, string[] expected)
         {
             // <Project>
@@ -139,6 +140,7 @@ namespace CsProjEditor.Tests
         public void InsertFailTest(string csprojPath)
         {
             // no test.
+            _ = Project.Load(csprojPath);
         }
 
         [Theory]

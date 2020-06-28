@@ -7,6 +7,8 @@
     <RootNamespace>SimpleCsProj</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'String A' == 'String B'">
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MicroBatchFramework" Version="1.2.0" />
   </ItemGroup>

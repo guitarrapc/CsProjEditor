@@ -1,5 +1,4 @@
-using MicroBatchFramework;
-using Microsoft.Extensions.Hosting;
+using ConsoleAppFramework;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using CsProjEditor;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
 namespace csprojcli
 {
@@ -15,11 +15,10 @@ namespace csprojcli
     class Program
     {
         static async Task Main(string[] args)
-            => await BatchHost.CreateDefaultBuilder()
-                .RunBatchEngineAsync<EditCsProj>(args);
+            => await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<EditCsProj>(args);
     }
 
-    public class EditCsProj : BatchBase
+    public class EditCsProj : ConsoleAppBase
     {
         private void Save(Project csproj, string path, string output, bool allowoverwrite)
         {

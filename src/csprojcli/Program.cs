@@ -607,8 +607,8 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             [Option("a", "attribute of node")]string attribute)
         {
-            this.Context.Logger.LogInformation(item.ToString());
-            var item = Project.Load(path).ExistsAttribute(group, node, attribute);
+            var item = Project.Load(path).ExistsAttribute(group, node, new CsProjAttribute(attribute));
+            Console.WriteLine(item.ToString());
         }
         [Command("attribute.insert", "insert specified attribute.")]
         public void AttributeInsert(

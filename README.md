@@ -112,7 +112,7 @@ E.g., run this for group attribute execution.:
 $ csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g Import
 $ csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include
 $ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include -v example.json -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
-$ csprojcli attribute.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Include -v project.json -pattern None -replacement Content -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
+$ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Project,Condition -v ".pack\\package.csproj","Exists('.pack\\package.csproj')" -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 $ csprojcli attribute.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Exclude -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 
 E.g., run this for node attribute execution.:
@@ -120,7 +120,6 @@ E.g., run this for node attribute execution.:
 $ csprojcli attribute.get -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None
 $ csprojcli attribute.exists -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include
 $ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v example.json -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
-$ csprojcli attribute.insert -p SimpleNewCsProjUtf8_CRLF.csproj -g Import -a Project,Condition -v ".pack\\package.csproj","Exists('.pack\\package.csproj')" -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 $ csprojcli attribute.replace -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Include -v project.json -pattern None -replacement Content -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 $ csprojcli attribute.remove -p SimpleNewCsProjUtf8_CRLF.csproj -g ItemGroup -n None -a Exclude -output result_SimpleNewCsProjUtf8_CRLF.csproj -allowoverwrite true
 

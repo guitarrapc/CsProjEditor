@@ -6,7 +6,6 @@
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!-- see https://github.com/dotnet/docs/issues/12237 -->
-    <RollForward>LatestMajor</RollForward>
 
     <!-- Version is override on CI -->
     <Version>1.0.0.0</Version>

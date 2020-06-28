@@ -19,14 +19,20 @@ namespace CsProjEditor.Tests
             new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" },
             new[] { "Import", "Import", "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "ItemGroup", "PropertyGroup", "Import", "Target", "Target", "PropertyGroup" })]
         [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj",
-            new[] { "PropertyGroup" },
-            new[] { "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target"})]
+            new[] { "PropertyGroup", "PropertyGroup" },
+            new[] { "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj",
-            new[] { "PropertyGroup" },
-            new[] { "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
+            new[] { "PropertyGroup", "PropertyGroup" },
+            new[] { "PropertyGroup", "PropertyGroup", "ItemGroup", "ItemGroup", "Target", "Target" })]
         public void GetTest(string csprojPath, string[] expected, string[] expected2)
         {
+            // <Project>
+            //   <PropertyGroup>
+            //   </PropertyGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
+            var x = csproj.GetGroup("PropertyGroup");
             csproj.GetGroup("PropertyGroup").Should().BeEquivalentTo(expected);
 
             csproj.GetGroups().Should().BeEquivalentTo(expected2);
@@ -52,6 +58,15 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
+            // <Project>
+            //   <PropertyGroup>
+            //   </PropertyGroup>
+            //   <ItemGroup>
+            //   </ItemGroup>
+            //   <Target>
+            //   </Target>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
             csproj.ExistsGroup("ItemGroup").Should().BeTrue();
@@ -74,22 +89,46 @@ namespace CsProjEditor.Tests
         [Theory]
         [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
         [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
-        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
-        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup" })]
-        public void InsertTest(string csprojPath, string[] expected)
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj", new[] { "PropertyGroup", "PropertyGroup", "PropertyGroup" })]
+        public void InsertExistingTest(string csprojPath, string[] expected)
         {
+            // <Project>
+            //   .... existings....
+            //   <PropertyGroup>
+            //   </PropertyGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             // additional existing group
             csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
             csproj.InsertGroup("PropertyGroup");
+            var x = csproj.ToString();
             csproj.GetGroup("PropertyGroup").Should().BeEquivalentTo(expected);
+        }
 
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void InsertNewTest(string csprojPath)
+        {
+            // <Project>
+            //   .... existings....
+            //   <Test>
+            //     <Hoge>Value</Hoge>
+            //   </Test>
+            // </Project>
+
+            var csproj = Project.Load(csprojPath);
             // new group
             csproj.ExistsGroup("Test").Should().BeFalse();
             csproj.InsertGroup("Test");
             csproj.ExistsGroup("Test").Should().BeTrue();
             csproj.GetGroup("Test").Should().BeEquivalentTo("Test");
             csproj.InsertNode("Test", "Hoge", "Value");
+            var x = csproj.ToString();
             csproj.ExistsNodeValue("Test", "Hoge", "Value").Should().BeTrue();
         }
 
@@ -101,6 +140,7 @@ namespace CsProjEditor.Tests
         public void InsertFailTest(string csprojPath)
         {
             // no test.
+            _ = Project.Load(csprojPath);
         }
 
         [Theory]
@@ -110,16 +150,49 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ReplaceTest(string csprojPath)
         {
+            // before
+            // <Project>
+            //   <PropertyGroup>
+            //   </PropertyGroup>
+            // </Project>
+
+            // after
+            // <Project>
+            //   <Hogemoge>
+            //   </Hogemoge>
+            // </Project>
             var csproj = Project.Load(csprojPath);
             // simple replacement
             csproj.ExistsGroup("PropertyGroup").Should().BeTrue();
             csproj.ReplaceGroup("PropertyGroup", "Hogemoge");
+            var x = csproj.ToString();
             csproj.ExistsGroup("Hogemoge").Should().BeTrue();
+        }
 
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void ReplaceWithPatternTest(string csprojPath)
+        {
+            // before
+            // <Project>
+            //   <ItemGroup>
+            //   </ItemGroup>
+            // </Project>
+
+            // after
+            // <Project>
+            //   <PiyoGroup>
+            //   </PiyoGroup>
+            // </Project>
+            var csproj = Project.Load(csprojPath);
             // replacement can specify which letter to replace with via `pattern`.
             // In this case, node name `ProjectGuid` will replace `Guid` with `Hogemoge`, so the resuld must be `ProjectHogemoge`.
             csproj.ExistsGroup("ItemGroup").Should().BeTrue();
             csproj.ReplaceGroup("ItemGroup", "Item", "Piyo");
+            var x = csproj.ToString();
             csproj.ExistsGroup("PiyoGroup").Should().BeTrue();
         }
 
@@ -162,24 +235,72 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.InsertGroup("Test");
             csproj.InsertNode("Test", "Foo", "value");
+            var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
+            var x = csproj.ToString();
+
+            // before
+            // <Project>
+            //   <Test>
+            //     <Foo>
+            //       value
+            //     </Foo>
+            //   </Test>
+            // </Project>
+
+            // after
+            // <Project>
+            //
+            // </Project>
 
             // Remove with leave blank line test.
-            var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
             csproj.ExistsGroup("Test").Should().BeTrue();
             var nodeCounts = csproj.GetNodes("Test").Length;
             csproj.RemoveGroup("Test", true);
+            var y = csproj.ToString();
             csproj.ExistsGroup("Test").Should().BeFalse();
             var afterCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
             afterCount.Should().Be(beforeCount - nodeCounts - 1);
+        }
 
-            // Remove node and remove blank line test.
+        [Theory]
+        [InlineData("testdata/SimpleOldCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleOldCsProjUtf8_LF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_CRLF.csproj")]
+        [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
+        public void RemoveAndBlankLineTest(string csprojPath)
+        {
+            // CRLF test will only run on windows
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && csprojPath.Contains("CRLF"))
+                return;
+
+            var csproj = Project.Load(csprojPath);
             csproj.InsertGroup("Test");
             csproj.InsertNode("Test", "Foo", "value");
+            var beforeCount = csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length;
+            var x = csproj.ToString();
+
+            // before
+            // <Project>
+            //   <Test>
+            //     <Foo>
+            //       value
+            //     </Foo>
+            //   </Test>
+            // </Project>
+
+            // after
+            // <Project>
+            // </Project>
+
+            // Remove node and remove blank line test.
             csproj.ExistsGroup("Test").Should().BeTrue();
             csproj.RemoveGroup("Test");
+            var y = csproj.ToString();
             csproj.ExistsGroup("Test").Should().BeFalse();
             // remove blankline will remove all blank line. In this case, previous remove's blank line also removed.
-            csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length.Should().Be(beforeCount - 1 - 1 - 1);
+            // 3 = Test + Foo + /Test
+            // 1 = original space
+            csproj.Root.ToString().Split(csproj.Eol.ToEolString()).Length.Should().Be(beforeCount - 3 - 1);
         }
 
         [Theory]

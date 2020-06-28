@@ -17,6 +17,12 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void GetTest(string csprojPath)
         {
+            // </Project>
+            //   <ItemGroup>
+            //    <None/>
+            //   </ItemGroup>
+            // </Project>
+
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.GetAttributeValue("ItemGroup", "None", "Include").Should().BeEquivalentTo(new[] { "project.json", "sample.json" });
@@ -41,6 +47,15 @@ namespace CsProjEditor.Tests
         [InlineData("testdata/SimpleNewCsProjUtf8_LF.csproj")]
         public void ExistsTest(string csprojPath)
         {
+            // <Project>
+            //   <ItemGroup>
+            //    <None Include="project.json" />
+            //    <Compile Include="App.cs" />
+            //   </ItemGroup>
+            //   <Target>
+            //    <Message Importance="high" />
+            //   </Target>
+            // </Project>
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "project.json").Should().BeTrue();
@@ -80,20 +95,20 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Fugafuga").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Fugafuga", "value");
-            csproj.InsertAttribute("PropertyGroup", "Fugafuga", "set", "hoge", e => !e.HasAttributes);
+            csproj.InsertAttribute("PropertyGroup", "Fugafuga", new CsProjAttribute("set", "hoge"), e => !e.HasAttributes);
             csproj.SetAttributeValue("PropertyGroup", "Fugafuga", "set", "fuga");
             csproj.ExistsNode("PropertyGroup", "Fugafuga").Should().BeTrue();
-            csproj.ExistsAttribute("PropertyGroup", "Fugafuga", "set").Should().BeTrue();
+            csproj.ExistsAttribute("PropertyGroup", "Fugafuga", new CsProjAttribute("set")).Should().BeTrue();
             csproj.ExistsAttributeValue("PropertyGroup", "Fugafuga", "set", "hoge").Should().BeFalse();
             csproj.ExistsAttributeValue("PropertyGroup", "Fugafuga", "set", "fuga").Should().BeTrue();
 
             // value match
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
-            csproj.InsertAttribute("PropertyGroup", "Hogemoge", "set", "hoge", e => !e.HasAttributes);
+            csproj.InsertAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set", "hoge"), e => !e.HasAttributes);
             csproj.SetAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge", "fuga");
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
-            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", "set").Should().BeTrue();
+            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set")).Should().BeTrue();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge").Should().BeFalse();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "fuga").Should().BeTrue();
 
@@ -126,10 +141,10 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
-            csproj.InsertAttribute("PropertyGroup", "Hogemoge", "set", "hoge", e => !e.HasAttributes);
+            csproj.InsertAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set", "hoge"), e => !e.HasAttributes);
             csproj.AppendAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge", "fuga");
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
-            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", "set").Should().BeTrue();
+            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set")).Should().BeTrue();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge").Should().BeFalse();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "hogefuga").Should().BeTrue();
 
@@ -162,10 +177,10 @@ namespace CsProjEditor.Tests
             var csproj = Project.Load(csprojPath);
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeFalse();
             csproj.InsertNode("PropertyGroup", "Hogemoge", "value");
-            csproj.InsertAttribute("PropertyGroup", "Hogemoge", "set", "hoge", e => !e.HasAttributes);
+            csproj.InsertAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set", "hoge"), e => !e.HasAttributes);
             csproj.PrependAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge", "fuga");
             csproj.ExistsNode("PropertyGroup", "Hogemoge").Should().BeTrue();
-            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", "set").Should().BeTrue();
+            csproj.ExistsAttribute("PropertyGroup", "Hogemoge", new CsProjAttribute("set")).Should().BeTrue();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "hoge").Should().BeFalse();
             csproj.ExistsAttributeValue("PropertyGroup", "Hogemoge", "set", "fugahoge").Should().BeTrue();
 
@@ -221,12 +236,12 @@ namespace CsProjEditor.Tests
 
             // not exists attribute will not do any.
             csproj.ExistsNode("ItemGroup", "None").Should().BeTrue();
-            csproj.ReplaceAttribute("ItemGroup", "None", "IncludeX", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
+            csproj.ReplaceAttribute("ItemGroup", "None", new CsProjAttribute("IncludeX", "Microsoft.VCLibs, Version=14.0"), "Hogemoge");
             csproj.ExistsAttributeValue("ItemGroup", "None", "Include", "Hogemoge").Should().BeFalse();
 
             // not exists node will not do any
             csproj.ExistsNode("ItemGroup", "NoneX").Should().BeFalse();
-            csproj.ReplaceAttribute("ItemGroup", "NoneX", "Include", "Microsoft.VCLibs, Version=14.0", "Hogemoge");
+            csproj.ReplaceAttribute("ItemGroup", "NoneX", new CsProjAttribute("Include", "Microsoft.VCLibs, Version=14.0"), "Hogemoge");
             csproj.ExistsAttributeValue("ItemGroup", "NoneX", "Include", "Hogemoge").Should().BeFalse();
         }
 

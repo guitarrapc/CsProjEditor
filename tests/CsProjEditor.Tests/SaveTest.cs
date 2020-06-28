@@ -65,8 +65,8 @@ namespace CsProjEditor.Tests
                 // Attribute / AttributeValue
                 csproj.ExistsNode("ItemGroup", "Hogemoge").Should().BeFalse();
                 csproj.InsertNode("ItemGroup", "Hogemoge", "fugafuga");
-                csproj.ExistsAttribute("ItemGroup", "Hogemoge", "Copy").Should().BeFalse();
-                csproj.SetAttribute("ItemGroup", "Hogemoge", "Copy", "hogemoge", e => !e.HasAttributes);
+                csproj.ExistsAttribute("ItemGroup", "Hogemoge", new CsProjAttribute("Copy")).Should().BeFalse();
+                csproj.SetAttribute("ItemGroup", "Hogemoge", new CsProjAttribute("Copy", "hogemoge"), e => !e.HasAttributes);
                 csproj.ExistsAttributeValue("ItemGroup", "Hogemoge", "Copy", "hogemoge").Should().BeTrue();
 
                 // save

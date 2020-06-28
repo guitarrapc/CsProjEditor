@@ -31,8 +31,8 @@ namespace CsProjEditor.ConsoleSample
             csproj.InsertNode("PropertyGroup", "AppxBundlePlatforms", "x86");
             csproj.InsertNode("PropertyGroup", "AppInstallerUpdateFrequency", "1");
             csproj.InsertNode("PropertyGroup", "AppInstallerCheckForUpdateFrequency", "OnApplicationRun");
-            csproj.InsertAttribute("ItemGroup", "None", "Include", pfx, e => !e.HasAttributes);
-            csproj.InsertAttribute("ItemGroup", "None", "Include", "Package.StoreAssociation.xml", e => !e.HasAttributes);
+            csproj.InsertAttribute("ItemGroup", "None", new CsProjAttribute("Include", pfx), e => !e.HasAttributes);
+            csproj.InsertAttribute("ItemGroup", "None", new CsProjAttribute("Include", "Package.StoreAssociation.xml"), e => !e.HasAttributes);
 
             // save
             csproj.Save(path);

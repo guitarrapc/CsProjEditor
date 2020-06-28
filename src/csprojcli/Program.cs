@@ -21,7 +21,10 @@ namespace csprojcli
     {
         private void Save(Project csproj, string path, string output, bool allowoverwrite)
         {
-            if (string.IsNullOrEmpty(output)) output = "modify_" + path;
+            if (string.IsNullOrEmpty(output))
+            {
+                output = Path.Combine(Path.GetDirectoryName(path), "modify_" + Path.GetFileName(path));
+            }
             if (File.Exists(output) && !allowoverwrite)
                 throw new IOException($"Output path {output} already exists. Please use `-allowoverwrite true`.");
             csproj.Save(output);
@@ -645,7 +648,6 @@ namespace csprojcli
             {
                 csproj.InsertAttribute(group, node, attributes, e => !e.HasAttributes);
             }
-            Console.WriteLine(dry);
             if (dry)
             {
                 Console.WriteLine(csproj.ToString());

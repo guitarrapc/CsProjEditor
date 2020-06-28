@@ -227,7 +227,7 @@ namespace CsProjEditor
 
             // get space
             var elements = root.Elements(ns + group).Where(filterElement).FirstOrDefault()?.Elements().Select(x => x?.ToString()).Where(x => x != null);
-            if (ns != null)
+            if (ns != null && elements != null)
             {
                 var nsString = GetNameSpace(root, ns);
                 elements = elements.Select(x => x.Replace(nsString, ""));

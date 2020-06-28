@@ -1,0 +1,120 @@
+{
+    "path": "testdata/SimpleNewCsProjUtf8_CRLF.csproj",
+    "output": "testdata/result_SimpleNewCsProjUtf8_CRLF.csproj",
+    "dry": false,
+    "allowoverwrite": true,
+    "commands": [
+        {
+            "order": 1,
+            "type": "nodevalue",
+            "command": "set",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "PackageCertificateKeyFile",
+                "value": "hogehoge.pfx"
+            }
+        },
+        {
+            "order": 2,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "PackageCertificateThumbprint",
+                "value": "1234567890ABCDEF"
+            }
+        },
+        {
+            "order": 3,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "GenerateAppInstallerFile",
+                "value": "False"
+            }
+        },
+        {
+            "order": 4,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppxAutoIncrementPackageRevision",
+                "value": "True"
+            }
+        },
+        {
+            "order": 5,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppxSymbolPackageEnabled",
+                "value": "False"
+            }
+        },
+        {
+            "order": 6,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppxBundle",
+                "value": "Always"
+            }
+        },
+        {
+            "order": 7,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppxBundlePlatforms",
+                "value": "x86"
+            }
+        },
+        {
+            "order": 8,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppInstallerUpdateFrequency",
+                "value": "1"
+            }
+        },
+        {
+            "order": 9,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "PropertyGroup",
+                "node": "AppInstallerCheckForUpdateFrequency",
+                "value": "OnApplicationRun"
+            }
+        },
+        {
+            "order": 10,
+            "type": "attribute",
+            "command": "insert",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Include",
+                "value": "hogehoge.pfx"
+            }
+        },
+        {
+            "order": 11,
+            "type": "node",
+            "command": "insert",
+            "parameter": {
+                "group": "ItemGroup",
+                "node": "None",
+                "attribute": "Include",
+                "value": "Package.StoreAssociation.xml"
+            }
+        }
+    ]
+}

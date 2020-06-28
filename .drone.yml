@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: build
-    image: mcr.microsoft.com/dotnet/core/sdk:3.2
+    image: mcr.microsoft.com/dotnet/core/sdk:3.1
     commands:
       - dotnet restore
       - dotnet build -c Debug
@@ -12,7 +12,7 @@ steps:
         - push
 
   - name: test
-    image: mcr.microsoft.com/dotnet/core/sdk:3.2
+    image: mcr.microsoft.com/dotnet/core/sdk:3.1
     environment:
       CODECOV_TOKEN:
         from_secret: CODECOV_TOKEN
@@ -28,7 +28,7 @@ steps:
         - push
 
   - name: deploy
-    image: mcr.microsoft.com/dotnet/core/sdk:3.2
+    image: mcr.microsoft.com/dotnet/core/sdk:3.1
     environment:
       NUGET_KEY:
         from_secret: NUGET_KEY

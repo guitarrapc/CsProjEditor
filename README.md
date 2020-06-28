@@ -186,21 +186,35 @@ more examples? check [examples](https://github.com/guitarrapc/CsProjEditor/tree/
 * [x] NodeValue: Prepend
 * [x] NodeValue: Remove
 * [x] NodeValue: Replace
-* [x] Attribute: Get
-* [x] Attribute: Exists
-* [x] Attribute: Insert
-* [x] Attribute: Set
-* [x] Attribute: Remove
-* [x] Attribute: Replace
-* [x] AttributeValue: Get
-* [x] AttributeValue: Exists
-* [x] AttributeValue: Set
-* [x] AttributeValue: Append
-* [x] AttributeValue: Prepend
-* [x] AttributeValue: Remove
-* [x] AttributeValue: Replace
+* [x] Attribute: Get (Group)
+* [x] Attribute: Get (Node)
+* [x] Attribute: Exists (Group)
+* [x] Attribute: Exists (Node)
+* [x] Attribute: Insert (Group)
+* [x] Attribute: Insert (Node)
+* [x] Attribute: Set (Group)
+* [x] Attribute: Set (Node)
+* [x] Attribute: Remove (Group)
+* [x] Attribute: Remove (Node)
+* [x] Attribute: Replace (Group)
+* [x] Attribute: Replace (Node)
+* [ ] AttributeValue: Get (Group)
+* [x] AttributeValue: Get (Node)
+* [ ] AttributeValue: Exists (Group)
+* [x] AttributeValue: Exists (Node)
+* [ ] AttributeValue: Set (Group)
+* [x] AttributeValue: Set (Node)
+* [ ] AttributeValue: Append (Group)
+* [x] AttributeValue: Append (Node)
+* [ ] AttributeValue: Prepend (Group)
+* [x] AttributeValue: Prepend (Node)
+* [ ] AttributeValue: Remove (Group)
+* [x] AttributeValue: Remove (Node)
+* [ ] AttributeValue: Replace (Group)
+* [x] AttributeValue: Replace (Node)
 * [x] Tests: Node
 * [x] Tests: NodeValue
-* [x] Tests: Attribute
+* [x] Tests: Attribute (Group)
+* [x] Tests: Attribute (Node)
 * [x] Tests: AttributeValue
 * [x] Tests: Save

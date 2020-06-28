@@ -1,5 +1,4 @@
 using ConsoleAppFramework;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -123,12 +122,12 @@ namespace csprojcli
                 // validate required parameter
                 if (string.IsNullOrWhiteSpace(command.parameter.group))
                 {
-                    Context.Logger.LogWarning($"#{command.order}: {command.parameter.group} was empty, please specify node. skip and run next.");
+                    Console.WriteLine($"#{command.order}: {command.parameter.group} was empty, please specify node. skip and run next.");
                     continue;
                 }
                 if (string.IsNullOrWhiteSpace(command.parameter.node))
                 {
-                    Context.Logger.LogWarning($"#{command.order}: {command.parameter.node} was empty, please specify node. skip and run next.");
+                    Console.WriteLine($"#{command.order}: {command.parameter.node} was empty, please specify node. skip and run next.");
                     continue;
                 }
 
@@ -312,7 +311,7 @@ namespace csprojcli
         public void GroupInsert(
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -331,7 +330,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             string pattern,
             string replacement,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -350,7 +349,7 @@ namespace csprojcli
             [Option("p", "path of csproj.")]string path,
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("l", "leave brank line")]bool leaveBrankLine = false,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -409,7 +408,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value = "",
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -429,7 +428,7 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             string pattern,
             string replacement,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -449,7 +448,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("l", "leave brank line")]bool leaveBrankLine = false,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -493,7 +492,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -512,7 +511,7 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
             string append,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -532,7 +531,7 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
             string prepend,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -553,7 +552,7 @@ namespace csprojcli
             [Option("v", "value of node")]string value,
             string pattern,
             string replacement,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -571,7 +570,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("n", "name of node")]string node,
             [Option("v", "value of node")]string value,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -625,24 +624,28 @@ namespace csprojcli
         }
         [Command("attribute.insert", "insert specified attribute.")]
         public void AttributeInsert(
-            [Option("p", "path of csproj.")]string path,
-            [Option("g", "group of nodes. eg. PropertyGroup")]string group,
-            [Option("a", "attribute of node")]string attribute,
+            [Option("p", "path of csproj.")] string path,
+            [Option("g", "group of nodes. eg. PropertyGroup")] string group,
+            [Option("a", "attribute of node")] string[] attribute,
             [Option("n", "name of node")] string node = "",
-            [Option("v", "value of attribute")]string value = "",
-            bool dry = true,
+            [Option("v", "value of attribute")] string[] value = null,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
             var csproj = Project.Load(path);
+            if (value == null)
+                value = Enumerable.Range(0, attribute.Length).Select(x => "").ToArray();
+            var attributes = attribute.Zip(value, (a, v) => new CsProjAttribute(a, v)).ToArray();
             if (string.IsNullOrEmpty(node))
             {
-                csproj.InsertAttribute(group, new CsProjAttribute(attribute, value), e => !e.HasAttributes);
+                csproj.InsertAttribute(group, attributes, e => !e.HasAttributes);
             }
             else
             {
-                csproj.InsertAttribute(group, node, new CsProjAttribute(attribute, value), e => !e.HasAttributes);
+                csproj.InsertAttribute(group, node, attributes, e => !e.HasAttributes);
             }
+            Console.WriteLine(dry);
             if (dry)
             {
                 Console.WriteLine(csproj.ToString());
@@ -659,7 +662,7 @@ namespace csprojcli
             string pattern,
             string replacement,
             [Option("n", "name of node")] string node = "",
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -685,7 +688,7 @@ namespace csprojcli
             [Option("g", "group of nodes. eg. PropertyGroup")]string group,
             [Option("a", "attribute of node")]string attribute,
             [Option("n", "name of node")] string node = "",
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -739,7 +742,7 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             [Option("a", "attribute of node")]string attribute,
             [Option("v", "value of attribute")]string value,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -759,7 +762,7 @@ namespace csprojcli
             [Option("a", "attribute of node")]string attribute,
             [Option("v", "value of attribute")]string value,
             string append = "",
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -780,7 +783,7 @@ namespace csprojcli
             [Option("a", "attribute of node")]string attribute,
             [Option("v", "value of attribute")]string value,
             string prepend = "",
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -802,7 +805,7 @@ namespace csprojcli
             [Option("v", "value of attribute")]string value,
             string pattern,
             string replacement,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {
@@ -821,7 +824,7 @@ namespace csprojcli
             [Option("n", "name of node")]string node,
             [Option("a", "attribute of node")]string attribute,
             [Option("v", "value of attribute")]string value,
-            bool dry = true,
+            bool dry = false,
             string output = "",
             bool allowoverwrite = false)
         {

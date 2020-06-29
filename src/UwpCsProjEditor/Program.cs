@@ -1,6 +1,5 @@
-using MicroBatchFramework;
+using ConsoleAppFramework;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -13,56 +12,56 @@ namespace UwpCsProjEdior
     class Program
     {
         static async Task Main(string[] args)
-            => await BatchHost.CreateDefaultBuilder()
-                .RunBatchEngineAsync<CsProjEdior>(args);
+            => await Host.CreateDefaultBuilder()
+                .RunConsoleAppFrameworkAsync<CsProjEdior>(args);
     }
 
-    public class CsProjEdior : BatchBase
+    public class CsProjEdior : ConsoleAppBase
     {
         [Command("store-publish", "modify csproj as uwp store publish modify.")]
         public void Run(string path, string pfx, string thumbnail, string output, bool allowoverwrite = false)
         {
-            this.Context.Logger.LogInformation($"command: 'uwp-store-publish'. Parameters are as follows.");
-            this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
-            this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
-            this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");
-            this.Context.Logger.LogInformation($"{nameof(output)}: {output}");
-            this.Context.Logger.LogInformation($"{nameof(allowoverwrite)}: {allowoverwrite}");
-            this.Context.Logger.LogInformation("\n");
+            Console.WriteLine($"command: 'uwp-store-publish'. Parameters are as follows.");
+            Console.WriteLine($"{nameof(path)}: {path}");
+            Console.WriteLine($"{nameof(pfx)}: {pfx}");
+            Console.WriteLine($"{nameof(thumbnail)}: {thumbnail}");
+            Console.WriteLine($"{nameof(output)}: {output}");
+            Console.WriteLine($"{nameof(allowoverwrite)}: {allowoverwrite}");
+            Console.WriteLine("\n");
 
             // run
-            this.Context.Logger.LogInformation($"begin editing csproj.");
+            Console.WriteLine($"begin editing csproj.");
             var csproj = Project.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // save
-            this.Context.Logger.LogInformation($"saving generated csproj to {output}");
+            Console.WriteLine($"saving generated csproj to {output}");
             if (File.Exists(output) && !allowoverwrite)
             {
                 throw new IOException($"Output path {output} already exists. Please use `-allowoverwrite true`.");
             }
             csproj.Save(output);
-            this.Context.Logger.LogInformation($"complete! new csproj generated at {output}");
+            Console.WriteLine($"complete! new csproj generated at {output}");
         }
 
         [Command("dryrun-store-publish", "dryrun: modify csproj as uwp store publish modify.")]
         public void DryRun(string path, string pfx, string thumbnail)
         {
-            this.Context.Logger.LogInformation($"command: 'dry-uwp-store-publish'. Parameters are as follows.");
-            this.Context.Logger.LogInformation($"{nameof(path)}: {path}");
-            this.Context.Logger.LogInformation($"{nameof(pfx)}: {pfx}");
-            this.Context.Logger.LogInformation($"{nameof(thumbnail)}: {thumbnail}");
+            Console.WriteLine($"command: 'dry-uwp-store-publish'. Parameters are as follows.");
+            Console.WriteLine($"{nameof(path)}: {path}");
+            Console.WriteLine($"{nameof(pfx)}: {pfx}");
+            Console.WriteLine($"{nameof(thumbnail)}: {thumbnail}");
 
             // run
-            this.Context.Logger.LogInformation($"begin editing csproj\n");
+            Console.WriteLine($"begin editing csproj\n");
             var csproj = CsProjEditor.Project.Load(path);
             Modify(csproj, pfx, thumbnail);
 
             // output inmemory xml
-            this.Context.Logger.LogInformation("complete! generated csproj will be follows.");
-            this.Context.Logger.LogInformation("========== FROM HERE ==========");
-            this.Context.Logger.LogInformation(csproj.ToString());
-            this.Context.Logger.LogInformation("========== UNTIL HERE ==========");
+            Console.WriteLine("complete! generated csproj will be follows.");
+            Console.WriteLine("========== FROM HERE ==========");
+            Console.WriteLine(csproj.ToString());
+            Console.WriteLine("========== UNTIL HERE ==========");
         }
 
         private void Modify(CsProjEditor.Project csproj, string pfx, string thumbnail)

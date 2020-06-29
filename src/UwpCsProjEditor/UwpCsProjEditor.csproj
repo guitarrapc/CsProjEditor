@@ -12,7 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MicroBatchFramework" Version="1.2.0" />
+    <PackageReference Include="ConsoleAppFramework" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
   </ItemGroup>
 
   <ItemGroup>
